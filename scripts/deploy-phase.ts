@@ -8,6 +8,7 @@ import { log, colors, runCommand, parseContractId, prompt, RPC_URL, REQUIRED_AMO
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
+import { creatorPreflight } from "./creator-preflight.js"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -140,5 +141,14 @@ async function main() {
   console.log(`  ${colors.yellow}¡Ambos contratos listos para interactuar!${colors.reset}`);
   console.log(`  ${colors.cyan}Ejecuta: npm run interact${colors.reset}`);
 }
+
+creatorPreflight({
+  script: "deploy-phase.ts",
+  plan: [
+    "build and optimize contracts/phase-protocol (wasm32v1-none)",
+    "stellar contract deploy it to testnet",
+    "invoke initialize with the TESTING_SECRET_KEY address, MOCK_TOKEN_ID and REQUIRED_AMOUNT",
+  ],
+})
 
 main().catch(console.error);

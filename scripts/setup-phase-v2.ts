@@ -35,6 +35,7 @@ import {
   TransactionBuilder,
 } from "@stellar/stellar-sdk"
 import { z } from "zod"
+import { creatorPreflight } from "./creator-preflight.js"
 
 dotenv.config()
 
@@ -353,6 +354,18 @@ async function main() {
 
   console.log("Done.")
 }
+
+creatorPreflight({
+  script: "setup-phase-v2.ts",
+  plan: [
+    "generate new Issuer and Distributor keypairs",
+    "fund both with Friendbot",
+    "Distributor changeTrust to PHASELQ",
+    "Issuer pays the initial supply to Distributor",
+    "stellar contract asset deploy for that asset",
+    "print an .env.local block",
+  ],
+})
 
 main().catch((e) => {
   const msg = e instanceof Error ? e.message : String(e)

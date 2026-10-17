@@ -7,6 +7,7 @@
 
 import { Keypair, StrKey } from "@stellar/stellar-sdk"
 import { colors, log, RPC_URL, runCommand, TESTING_SECRET_KEY } from "./utils.js"
+import { creatorPreflight } from "./creator-preflight.js"
 
 const TOKEN_CONTRACT_ID =
   process.env.TOKEN_CONTRACT_ID?.trim() ||
@@ -78,6 +79,13 @@ async function main() {
   console.log(`${colors.cyan}Symbol:${colors.reset}   ${TOKEN_SYMBOL}`)
   console.log(`${colors.cyan}Decimals:${colors.reset} ${TOKEN_DECIMALS}`)
 }
+
+creatorPreflight({
+  script: "setup_token.ts",
+  plan: [
+    "invoke initialize/metadata on the existing token contract (TOKEN_CONTRACT_ID or MOCK_TOKEN_ID)",
+  ],
+})
 
 main().catch((e) => {
   log.error(e instanceof Error ? e.message : String(e))

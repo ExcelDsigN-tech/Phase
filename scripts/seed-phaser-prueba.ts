@@ -24,6 +24,7 @@ import { readFileSync, existsSync } from "fs"
 import { resolve, dirname } from "path"
 import { fileURLToPath } from "url"
 import { Keypair } from "@stellar/stellar-sdk"
+import { creatorPreflight } from "./creator-preflight.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, "..")
@@ -171,5 +172,13 @@ function main() {
   const origin = process.env.NEXT_PUBLIC_APP_ORIGIN?.trim() || "http://localhost:3000"
   printNextSteps(newId, origin.replace(/\/$/, ""))
 }
+
+creatorPreflight({
+  script: "seed-phaser-prueba.ts",
+  plan: [
+    "invoke create_collection(PHASERPRUEBA) on the PHASE contract from SEED_PHASER_PRUEBA_SECRET or ADMIN_SECRET_KEY",
+    "print the collection id and /chamber link",
+  ],
+})
 
 main()

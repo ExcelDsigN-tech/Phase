@@ -1,3 +1,12 @@
+import { creatorPreflight } from "./creator-preflight.js"
+
+creatorPreflight({
+  script: "check-secret-rotation.ts",
+  plan: [
+    "read secret rotation metadata from env and report fresh / due / overdue (read-only)",
+  ],
+})
+
 type RotationStatus = "missing_metadata" | "fresh" | "due" | "overdue"
 
 type RotationReport = {

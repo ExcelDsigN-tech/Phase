@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import { runCommand, getMockTokenId, getPhaseProtocolId, REQUIRED_AMOUNT, TOKEN_SYMBOL, TESTING_SECRET_KEY } from './utils.js';
 import { Keypair } from '@stellar/stellar-sdk';
 import * as readline from 'readline';
+import { creatorPreflight } from "./creator-preflight.js"
 
 const MOCK_TOKEN_ID = getMockTokenId()!;
 const PHASE_PROTOCOL_ID = getPhaseProtocolId()!;
@@ -240,5 +241,12 @@ async function main() {
     }
   }
 }
+
+creatorPreflight({
+  script: "interact.ts",
+  plan: [
+    "open an interactive menu; each choice runs stellar contract invoke (mint_public, balance, get_config, has_phased, ...) against MOCK_TOKEN_ID / PHASE_PROTOCOL_ID",
+  ],
+})
 
 main();

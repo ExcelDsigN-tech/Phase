@@ -28,6 +28,7 @@ import * as path from "node:path"
 import { fileURLToPath } from "node:url"
 import { Asset, BASE_FEE, Horizon, Keypair, Networks, Operation, TransactionBuilder } from "@stellar/stellar-sdk"
 import { z } from "zod"
+import { creatorPreflight } from "./creator-preflight.js"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, "..")
@@ -758,6 +759,15 @@ const isDirectCliInvocation = process.argv[1]
   : false
 
 if (isDirectCliInvocation) {
+  creatorPreflight({
+    script: "reset-phase.ts",
+    plan: [
+      "create new Issuer and Distributor",
+      "fund both with Friendbot",
+      "Distributor trustline and bulk payment from Issuer",
+      "print .env.local variables and the SAC deploy command",
+    ],
+  })
   main().catch((e) => {
     console.error(e instanceof Error ? e.message : e)
     process.exit(1)

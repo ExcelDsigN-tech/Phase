@@ -2,48 +2,73 @@
 
 ## What the issue claimed
 
-Creators juggle a dozen one-off scripts with no shared entry point, no machine-readable output and no reliable exit codes. Metadata only fails once it hits the contract, pinning needs the web app, and env problems surface as stack traces.
+Deploying is a manual, multi-step shell process. Fifteen one-off scripts share no CLI framework, bin or validation layer. Metadata rules are only enforced on-chain, so creators find violations after paying fees, and pinning needs a running Next.js server. The goal is a standalone terminal CLI with scaffolding, offline validation that mirrors the Rust rules, resumable pin-then-deploy, and CI-friendly output (`--json`, `--dry-run`, `--network`, exit codes).
 
 ## What the code actually did at spike time
 
-- Twelve scripts under `scripts/`, each loading `.env.local` its own way, printing free-form Spanish/English text, and calling `process.exit(1)` for every kind of failure. None had tests.
-- `scripts/package.json` is `"type": "module"`, which breaks named imports from `lib/` under tsx. `scripts/diagnose-env.ts` already documented this and forwards to the root `diagnose-env.ts`.
+- The scripts under `scripts/` each load `.env.local` their own way, print free-form text, and `process.exit(1)` for every kind of failure. None had tests.
+- `scripts/package.json` is `"type": "module"`, which breaks named imports from `lib/` under tsx. `scripts/diagnose-env.ts` already documented this.
 - `create_collection` in `lib.rs` rejects with `#9` when `price <= 0` and `#10` when `str_is_safe_for_json_fragment` fails for `name` (64) or `image_uri` (256). That check counts **UTF-8 bytes**, allows empty strings, and rejects `"`, `\` and bytes below `0x20`. **It does not reject non-ASCII.**
-- The existing TS check, `lib/phase-protocol.ts:validateCollectionImageUri`, counts UTF-16 code units, so a URI with multi-byte characters can pass the UI and still revert on-chain with `#10`. The new parity test shows it with a 258-byte URI the old check accepts.
-- The Pinata JWT lookup lived inside `app/api/ipfs/route.ts`.
+- `lib/phase-protocol.ts:validateCollectionImageUri` counts UTF-16 code units, so a multi-byte URI can pass the UI and still revert on-chain with `#10`.
+- `scripts/setup_token.ts` hardcodes a token contract ID and an admin address as fallbacks. That predates this spike and is listed under follow-up.
 
-A note on the issue text. It asks for ASCII rejection, but the contract doesn't reject non-ASCII, so an offline validator that did would block names the chain accepts. The validator mirrors the contract exactly and reports non-ASCII as a warning, since it eats the byte budget faster.
+The issue asks for ASCII rejection, but the contract doesn't reject non-ASCII, so a validator that did would block names the chain accepts. The validator mirrors the contract and reports non-ASCII as a warning.
 
-## Delivered (phase-161)
+## Delivered in this PR (phase-161)
 
-1. **One command tree** (`lib/creator-cli.ts`, entry `scripts/phase-creator.cts`, `bin: phase-creator`, `npm run creator --`): `scaffold`, `validate`, `env`, `pin`, `deploy`, `run`. Global `--json`, `--dry-run`, `--network` (only `testnet` is accepted). Exit codes: 0 ok, 1 invalid input, 2 usage, 3 env missing, 4 remote failure, 5 flag off. All I/O is injected, so the whole tree is unit-tested.
-2. **Offline validation with parity** (`lib/creator-metadata-rules.ts`): a byte-exact port of `str_is_safe_for_json_fragment`, plus price (`> 0`, integer, fits i128). Issues are tagged `chain` (would revert, with the PhaseError number), `app` (UI policy such as the https/ipfs scheme) or `warn`. The vectors in `contracts/phase-protocol/test-vectors/json-fragment.tsv` are read by both `lib/__tests__/creator-metadata-rules.test.ts` and a new Rust test in `src/test.rs`.
-3. **Headless pin**: `pin <file>` reads `PINATA_JWT` / `PINATA_API_JWT` through the new shared `resolvePinataJwt` (the API route uses it too), pins with `pinFileToIpfsWithRetry` and checksum verification, and scrubs the JWT and any Stellar seed from every message. `--dry-run` only computes size and sha256.
-4. **Reusable env diagnostics** (`lib/env-validation.ts:diagnoseCreatorEnv`): presence and format checks per capability (`pin`, `deploy`), a testnet passphrase check, and a check for a secret seed sitting in a `NEXT_PUBLIC_*` var. It never returns a value, prefix or length. `diagnose-env.ts` prints the same section when the flag is on.
-5. **Deploy**: `deploy` checks env and the optimized WASM, prints the plan with `--dry-run`, and otherwise runs `scripts/deploy-phase-sep50.ts`. `run <script>` reaches the other scripts through an allowlist only.
+1. **One command tree** (`lib/creator-cli.ts`, entry `scripts/phase-creator.cts`, `bin: phase-creator`, `npm run creator --`): `scaffold`, `validate`, `env` (the diagnose command), `pin`, `deploy`, `run`. Global `--json`, `--dry-run`, `--network` (only `testnet`). Exit codes: 0 ok, 1 invalid input, 2 usage, 3 env missing, 4 remote failure, 5 flag off.
+2. **Offline validation with Rust parity** (`lib/creator-metadata-rules.ts`): a byte-exact port of `str_is_safe_for_json_fragment` plus the price rule. Issues are tagged `chain` (would revert, with the PhaseError number), `app` or `warn`. Shared vectors in `contracts/phase-protocol/test-vectors/json-fragment.tsv` run in vitest and in `src/test.rs`.
+3. **Headless pin**: `pin <file>` uses the shared `resolvePinataJwt` (the API route uses it too) and `pinFileToIpfsWithRetry` with checksum verification. The JWT and any Stellar seed are scrubbed from every message.
+4. **Reusable env diagnostics** (`lib/env-validation.ts:diagnoseCreatorEnv`): presence and format per capability, a testnet passphrase check, and detection of a secret seed in a `NEXT_PUBLIC_*` var. It never returns a value. `diagnose-env.ts` shows the same section when the flag is on.
+5. **Thin wrappers**: every listed script now calls `creatorPreflight()` (`scripts/creator-preflight.ts`) right before its `main()`. `--dry-run` prints that script's plan and exits 0 before any network call, key generation or file write. With `FEATURE_PHASE_161=1`, the script first runs `phase-creator env --json` and stops with exit 3 on a missing or malformed variable. With the flag off and no `--dry-run`, the preflight returns immediately and the script runs exactly as before. Each script's own logic is untouched.
 
-Read-only commands (`validate`, `env`, `help`) and every `--dry-run` work with the flag off. Anything that writes, pins or deploys needs `FEATURE_PHASE_161=1`.
+## Spike questions (from the issue)
 
-## Files ruled out
+1. **Minimal testnet loop, and which listed files can break it?** For this CLI the loop is: validate the draft offline, pin the asset, deploy and `initialize` phase-protocol, `create_collection` with the validated draft, mint, then display it in `/chamber`. Files that can break it on their own: `lib/creator-metadata-rules.ts` (a validator that disagrees with `lib.rs` lets a draft through that reverts with `#10`; the shared vectors fence this), `lib/ipfs-upload-retry.ts` and `app/api/ipfs/route.ts` (JWT lookup and pin), `scripts/deploy-phase-sep50.ts` (deploy and `.env.local` rewrite), and `lib/env-validation.ts` (a wrong check blocks deploy with exit 3). The live run is in the checklist below.
+2. **Replay and idempotency per write.** `validate` and `env` don't write. `pin` is content-addressed: pinning the same bytes twice returns the same CID, and the sha256 check catches corrupted retries. `deploy` is **not** idempotent, because each run deploys a new contract instance and rewrites `.env.local`. The CLI doesn't resume a half-finished deploy. That's the "resumable pin-then-deploy" ask, and it's listed under follow-up. A double submit after a timeout in `create_collection` creates two collections, since the contract has no dedupe key; the CLI doesn't call `create_collection` itself.
+3. **Contract-ID drift, issuer rotation, gateway failover.** `env --needs deploy` checks that `NEXT_PUBLIC_PHASER_TOKEN_ID` is a valid `C…` and the treasury a valid `G…`, but it can't tell whether they point at the deployment you meant. Drift between `.env.local` and the deployed instance isn't detected (follow-up). Pinning goes through Pinata only; the multi-gateway paths (phase-117/123) are read-side and not used by `pin`.
+4. **409/429/412 taxonomy.** The CLI maps outcomes to exit codes instead: Pinata 429/5xx is retried with backoff inside `pinFileToIpfsWithRetry`, then becomes exit 4 with the error code. No CLI command does an ETag/If-Match write. No input is lost because every command is file-based and nothing is overwritten (`scaffold` refuses an existing file).
+5. **Migration and rollback.** No WASM change and no schema change. Rollback is unsetting `FEATURE_PHASE_161`: side-effecting CLI commands exit 5, the preflight goes back to a no-op, read-only commands keep working, and nothing is persisted. A deploy made through the CLI is the same as one made by the old script, so the existing "new instance, old NFTs stay on the old contract" story applies.
 
-| File | Why it is not changed |
-|------|-----------------------|
-| `contracts/phase-protocol/src/lib.rs` | The on-chain rule stays as it is. Parity is tested from `src/test.rs`, which can reach the private `str_is_safe_for_json_fragment` through `use super::*`. |
-| `scripts/deploy-phase-sep50.ts`, `deploy-phase.ts`, `deploy-token.ts`, `setup_token.ts`, `setup-phase-v2.ts`, `interact.ts`, `issue-sac-token.ts`, `seed-phaser-prueba.ts`, `reset-phase.ts`, `check-secret-rotation.ts` | The issue asks for these to become thin wrappers. I inverted that: the CLI wraps them (`deploy`, `run`). They have no tests, mutate live testnet state, and couldn't be exercised from this container, so rewriting them blind would be a regression risk with nothing to catch it. Folding each one into `lib/creator-cli.ts` is follow-up work once someone can verify it against testnet. |
-| `scripts/utils.ts` | Only the old scripts import it, and its RPC/Horizon clients are built at import time. The CLI doesn't need them. |
-| `lib/phase-nft-metadata-build.ts` | It builds SEP-50 JSON from values already on-chain, so it can't see a draft before `create_collection`. The pre-chain check belongs in the new rules module. The UTF-16 drift is in `lib/phase-protocol.ts` (not listed) and is recorded above rather than changed, because changing it alters what the live UI accepts. |
+## Acceptance criteria status
 
-## Spike questions
+| Criterion | Status |
+|---|---|
+| End-to-end testnet proof with tx hashes and contract IDs, no hardcoded IDs | Runner and checklist below. Needs the live run. The new code hardcodes no IDs. |
+| Concurrency proof (409 with current version) | Not applicable: the CLI does no versioned writes. |
+| Abuse proof (self-deal, sybil, replay, expired, tampered; no PII in labels) | Tampered or invalid metadata is rejected offline with the PhaseError it would cause. Secrets never reach output (tested). The rest is not applicable to a local tool. |
+| Resilience proof (RPC/gateway/Horizon failover, circuit breaker) | Pin retry with backoff is tested. RPC/Horizon failover is not part of this CLI. |
+| i18n, `#13` mapping, docs, flag row | CLI output is English-only by design (CI tool, no UI). `#13` handling is untouched. Flag row added in `PROJECT_ARCHITECTURE.md` §10 and `docs/TECHNICAL.md`. |
+| No regression with flags off (tsc, vitest) | `tsc --noEmit` 0 errors, vitest green, `--dry-run` tested for every wrapped script. |
 
-The upstream issue text was not reachable from the session that built this, so these follow the summary it was given.
+## Live proof checklist (run by the maintainer)
 
-1. **Rollback?** Unset `FEATURE_PHASE_161`. Side-effecting commands exit 5, read-only commands keep working, and `diagnose-env` drops the section. The `resolvePinataJwt` refactor keeps the route's lookup order exactly as before.
-2. **WASM or contract migration?** None. The contract is untouched. The only Rust change is a test.
-3. **Metrics?** None. It's a local tool. Output is structured (`--json`) and secret-free, so CI can parse it.
-4. **Tests?** `creator-metadata-rules.test.ts` (27 cases including the shared vectors and the UTF-16 drift), `creator-cli.test.ts` (14 cases covering parsing, every exit code, the flag gate, headless pin success and failure with the JWT scrubbed, deploy delegation, the run allowlist, and the public-var secret check), and two Rust tests in `src/test.rs`.
-5. **Security?** Secrets are never printed (tested with a JWT echoed back by a fake upstream), `run` is allowlisted, only `--network testnet` is accepted, and `scaffold` refuses to overwrite.
+Prereqs: `stellar` CLI on PATH, a funded testnet admin account, a Pinata JWT, and the optimized WASM built (`cd contracts/phase-protocol && cargo build --target wasm32-unknown-unknown --release && stellar contract optimize ...`).
 
-## Test status and what still needs verification
+1. Put these in `.env.local` (never commit it): `FEATURE_PHASE_161=1`, `PINATA_JWT`, `ADMIN_SECRET_KEY`, `NEXT_PUBLIC_PHASER_TOKEN_ID`, `NEXT_PUBLIC_CLASSIC_LIQ_ISSUER`, `STELLAR_NETWORK_PASSPHRASE=Test SDF Network ; September 2015`.
+2. `npm run creator -- env --needs pin,deploy` should exit 0 with every check `ok`.
+3. `npm run creator -- scaffold ./my-drop`, fill in `name` and `image_uri`, then `npm run creator -- validate ./my-drop/collection.json`. Then try a name with a `"` and confirm exit 1 with `PhaseError #10`.
+4. Dry run: `npm run proof:661 -- --asset ./my-drop/cover.png --collection ./my-drop/collection.json`.
+5. Live run: `npm run proof:661 -- --asset ./my-drop/cover.png --collection ./my-drop/collection.json --live`.
+6. Wrapper check: `npx tsx scripts/reset-phase.ts --dry-run` and `npx tsx scripts/deploy-phase-sep50.ts --dry-run` print a plan and exit 0, and nothing appears on stellar.expert for the admin account.
+7. Attach `.data/proofs/661-*.json` and fill in:
 
-- **Rust:** `cargo test` doesn't run on `main` today, for two reasons that predate this branch. (a) `ethnum 1.5.2` in `Cargo.lock` fails to compile on rustc 1.97 (`E0512` transmute). (b) With rustc 1.88 the deps build, but `lib.rs` itself has 36 errors from `PhaseError` / `DataKey` variants that earlier merges dropped (`RaffleNotFound`, `InvalidSplitPayees`, `EditionCounter`, `DropWindow`, and others). Restoring them means picking on-chain error discriminants, which is out of scope and not something to guess. To still prove parity, the session extracted `str_is_safe_for_json_fragment` verbatim from `lib.rs` into a scratch crate and ran the shared-vector test against it with rustc 1.88. It passed. `create_collection_counts_utf8_bytes_not_chars` will run once the crate compiles again.
-- A real `pin` against Pinata and a real `deploy` against testnet. No CIDs, contract IDs or tx hashes are claimed here.
+| Item | Value |
+|---|---|
+| Pinned CID (`pin` step `uri`) | `<<PASTE ipfs://…>>` |
+| Pin sha256 | `<<PASTE>>` |
+| New phase-protocol contract ID (deploy output) | `<<PASTE C…>>` |
+| Deploy tx hash | `<<PASTE>>` |
+| `initialize` tx hash | `<<PASTE>>` |
+| `create_collection` tx hash (via `/forge` or `stellar contract invoke`) | `<<PASTE>>` |
+| Collection id shown in `/chamber?collection=` | `<<PASTE>>` |
+| Proof file name | `<<PASTE .data/proofs/661-….json>>` |
+
+## Follow-up / out of scope for this PR
+
+- **Resumable pin-then-deploy**: persist a step journal so a failed deploy resumes instead of starting over.
+- **Contract-ID drift detection**: compare `.env.local` IDs with what the RPC reports for the WASM hash.
+- **Fold the old scripts into the CLI**: they're wrappers now (preflight + dry-run), but their logic still lives in each file.
+- **Fix `validateCollectionImageUri`'s UTF-16 counting** in `lib/phase-protocol.ts` (not in this issue's file list; changing it changes what the live UI accepts).
+- **Remove the hardcoded fallback IDs** in `scripts/setup_token.ts`.
+- **Run the Rust parity test in CI.** `phase-protocol` doesn't compile on main until the `PhaseError` discriminant collision is resolved (see `docs/investigations/main-baseline-2026-10-17.md`). Until then, the shared vectors have been verified against `str_is_safe_for_json_fragment` extracted verbatim into a scratch crate.

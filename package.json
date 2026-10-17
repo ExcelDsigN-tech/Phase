@@ -24,7 +24,8 @@
     "security:audit": "npm audit --audit-level=high",
     "security:secret-rotation": "tsx scripts/check-secret-rotation.ts",
     "migrate:sqlite": "tsx scripts/migrate-json-to-sqlite.ts",
-    "creator": "tsx scripts/phase-creator.cts"
+    "creator": "tsx scripts/phase-creator.cts",
+    "proof:661": "tsx scripts/proof-creator-661.ts"
   },
   "dependencies": {
     "@albedo-link/intent": "0.12.0",

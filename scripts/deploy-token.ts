@@ -20,6 +20,7 @@ import {
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
+import { creatorPreflight } from "./creator-preflight.js"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -169,5 +170,14 @@ async function main() {
   console.log(`  `);
   console.log(`  ${colors.yellow}Guarda este Contract ID, lo necesitarás para el despliegue de Phase Protocol${colors.reset}`);
 }
+
+creatorPreflight({
+  script: "deploy-token.ts",
+  plan: [
+    "build contracts/mock-token",
+    "stellar contract deploy it to testnet",
+    "invoke initialize with TOKEN_DECIMALS, TOKEN_NAME and TOKEN_SYMBOL",
+  ],
+})
 
 main().catch(console.error);

@@ -28,6 +28,7 @@ import {
   TransactionBuilder,
 } from "@stellar/stellar-sdk"
 import { z } from "zod"
+import { creatorPreflight } from "./creator-preflight.js"
 
 dotenv.config()
 
@@ -257,6 +258,17 @@ async function main() {
   auditArtistAttestationWiringOnIssueSac()
   auditWatchlistWiringOnIssueSac()
 }
+
+creatorPreflight({
+  script: "issue-sac-token.ts",
+  plan: [
+    "generate new Issuer and Distributor keypairs",
+    "fund both with Friendbot",
+    "Distributor changeTrust to the classic asset",
+    "Issuer pays MINT_AMOUNT to Distributor",
+    "optionally lock the Issuer (masterWeight=0)",
+  ],
+})
 
 main().catch((e) => {
   console.error(e instanceof Error ? e.message : e)

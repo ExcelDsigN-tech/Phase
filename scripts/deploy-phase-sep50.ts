@@ -19,6 +19,7 @@ import { resolve, dirname } from "path"
 import { fileURLToPath } from "url"
 import { Keypair } from "@stellar/stellar-sdk"
 import { parseContractId } from "./utils.js"
+import { creatorPreflight } from "./creator-preflight.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, "..")
@@ -132,5 +133,15 @@ function main() {
 
   console.log("\nDone. NFTs on the previous contract stay there; this is a new deployment.")
 }
+
+creatorPreflight({
+  script: "deploy-phase-sep50.ts",
+  needs: ["deploy"],
+  plan: [
+    "stellar contract deploy the optimized phase-protocol WASM to testnet",
+    "invoke initialize(admin, token, required_amount, treasury)",
+    "rewrite lib/phase-contract-defaults.ts and .env.local with the new contract id",
+  ],
+})
 
 main()
