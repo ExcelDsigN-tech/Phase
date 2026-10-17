@@ -1,5 +1,6 @@
 /** Contenido de documentación del proyecto (no enlazado a archivos .md externos). */
 import type { LandingLang } from "@/lib/landing-copy"
+import { pickCopy } from "@/lib/phase-copy"
 
 export type DocsLinkItem = {
   label: string
@@ -15,6 +16,8 @@ export type DocsBlock =
   | { type: "code"; text: string; label?: string }
   | { type: "image"; src: string; alt: string; label?: string }
   | { type: "recipe"; recipe: DocsRecipe }
+  /** phase-162: the try-it-live console; the page renders the component. */
+  | { type: "playground"; intro: string }
 
 export type IntegrationRecipeId =
   | "trustline-bootstrap"
@@ -974,12 +977,24 @@ function recipesSection(lang: LandingLang): DocsSection {
   }
 }
 
-export function pickProjectDocs(lang: LandingLang, opts: { recipes?: boolean } = {}): ProjectDocsPage {
+function playgroundSection(lang: LandingLang): DocsSection {
+  const copy = pickCopy(lang).playground
+  return { id: "playground", title: copy.sectionTitle, blocks: [{ type: "playground", intro: copy.intro }] }
+}
+
+export function pickProjectDocs(
+  lang: LandingLang,
+  opts: { recipes?: boolean; playground?: boolean } = {},
+): ProjectDocsPage {
   const page = projectDocs[lang]
-  if (!opts.recipes) return page
-  // Recipes go just before the external links section.
+  if (!opts.recipes && !opts.playground) return page
+  // Recipes, then the playground, go just before the external links section.
+  const extra = [
+    ...(opts.recipes ? [recipesSection(lang)] : []),
+    ...(opts.playground ? [playgroundSection(lang)] : []),
+  ]
   const linksAt = page.sections.findIndex((s) => s.id === "links")
   const sections = [...page.sections]
-  sections.splice(linksAt === -1 ? sections.length : linksAt, 0, recipesSection(lang))
+  sections.splice(linksAt === -1 ? sections.length : linksAt, 0, ...extra)
   return { ...page, sections }
 }

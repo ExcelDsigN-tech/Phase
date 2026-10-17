@@ -1194,7 +1194,7 @@
           }
         },
         "x-state-changing": true,
-        "x-signing": "wallet",
+        "x-signing": "none",
         "requestBody": {
           "required": true,
           "content": {
@@ -1352,7 +1352,7 @@
           }
         },
         "x-state-changing": true,
-        "x-signing": "wallet",
+        "x-signing": "none",
         "requestBody": {
           "required": true,
           "content": {

@@ -4,12 +4,18 @@ import Image from "next/image"
 import Link from "next/link"
 import { LangToggle } from "@/components/lang-toggle"
 import { useLang } from "@/components/lang-context"
+import { DocsApiPlayground } from "@/components/docs-api-playground"
 import { pickProjectDocs, type DocsLinkItem, type DocsRecipe, type ProjectDocsPage } from "@/lib/project-docs-content"
 
 // phase-668. Read literally: Next only inlines NEXT_PUBLIC_* into client bundles
 // when accessed by name, so isFeatureEnabled's dynamic lookup is always off here.
 const RECIPES_ENABLED = ["1", "true", "yes", "on"].includes(
   (process.env.NEXT_PUBLIC_FEATURE_PHASE_668 ?? "").trim().toLowerCase(),
+)
+
+// phase-162 try-it-live console, read literally for the same reason.
+const PLAYGROUND_ENABLED = ["1", "true", "yes", "on"].includes(
+  (process.env.NEXT_PUBLIC_FEATURE_PHASE_162 ?? "").trim().toLowerCase(),
 )
 
 /** Renders text with every occurrence of "wallet" highlighted in cyan. */
@@ -161,7 +167,7 @@ function DocsRecipeCard({
 
 export default function DocsPage() {
   const { lang } = useLang()
-  const d = pickProjectDocs(lang, { recipes: RECIPES_ENABLED })
+  const d = pickProjectDocs(lang, { recipes: RECIPES_ENABLED, playground: PLAYGROUND_ENABLED })
 
   return (
     <div className="min-h-screen bg-background font-mono text-foreground">
@@ -270,6 +276,14 @@ export default function DocsPage() {
                           <pre className="overflow-x-auto border border-violet-500/20 bg-black/60 p-4 font-mono text-[10px] leading-relaxed text-zinc-300/85">
                             {block.text}
                           </pre>
+                        </div>
+                      )
+                    }
+                    if (block.type === "playground") {
+                      return (
+                        <div key={idx} className="space-y-4">
+                          <p className="font-sans text-[13px] leading-relaxed text-zinc-300/90">{block.intro}</p>
+                          <DocsApiPlayground />
                         </div>
                       )
                     }

@@ -1,11 +1,6 @@
 import type { AppLang } from "@/components/lang-context"
 import type { ImageUriValidationMessages } from "@/lib/phase-protocol"
 
-function getNodeEnv(): string {
-  if (typeof process === "undefined" || !process.env) return "production"
-  return process.env.NODE_ENV ?? "production"
-}
-
 export type ChamberLogsCopy = {
   chamberOnline: string
   walletRequest: string
@@ -206,6 +201,55 @@ export type QuestArcCopy = {
     treasuryLow: string
     identityBlocked: string
   }
+}
+
+/** phase-162 docs playground. `{sec}`, `{address}`, `{field}` placeholders where noted. */
+export type PlaygroundCopy = {
+  sectionTitle: string
+  intro: string
+  operation: string
+  pathParams: string
+  query: string
+  body: string
+  apiVersion: string
+  apiVersionHint: string
+  send: string
+  sending: string
+  signAndSend: string
+  /** `{sec}` */
+  retryIn: string
+  resetBody: string
+  correlationSent: string
+  correlationEchoed: string
+  versionEchoed: string
+  status: string
+  response: string
+  connectWallet: string
+  /** `{address}` */
+  walletConnected: string
+  badges: { stateChanging: string; walletSigned: string; testnetOnly: string; docsOnly: string }
+  docsOnly: { multipart_upload: string; needs_built_xdr: string; preflight: string }
+  fence: { docs_only: string; network_not_testnet: string; wallet_required: string; wallet_network_mismatch: string }
+  /** `{field}` where a field name applies. */
+  buildErrors: {
+    missing_path_param: string
+    invalid_json: string
+    body_not_object: string
+    unknown_field: string
+    invalid_jsonrpc: string
+  }
+  kinds: {
+    ok: string
+    jsonrpc_error: string
+    x402_shim_disabled: string
+    rate_limited: string
+    unavailable: string
+    version_rejected: string
+    http_error: string
+  }
+  networkError: string
+  signFailed: string
+  inputKept: string
 }
 
 const PHASE_HOST_CONTRACT_ERRORS_EN: readonly string[] = [
@@ -734,6 +778,7 @@ export const phaseCopy: Record<
     pricing: PricingCopy
     moderationQueue: ModerationQueueCopy
     questArcs: QuestArcCopy
+    playground: PlaygroundCopy
   }
 > = {
   en: {
@@ -1348,6 +1393,59 @@ export const phaseCopy: Record<
         treasuryLow: "Rewards are paused while the treasury refills.",
         identityBlocked: "This wallet is not eligible for quest arcs.",
       },
+    },
+    playground: {
+      sectionTitle: "Try it live",
+      intro: "Send real requests to this deployment's API. Read-only calls run as-is. Calls that change state are fenced to testnet, and calls that need a signature are signed by your wallet in this browser. The server never sees a key.",
+      operation: "Operation",
+      pathParams: "Path parameters",
+      query: "Query parameters",
+      body: "Request body (JSON)",
+      apiVersion: "API version",
+      apiVersionHint: "Leave empty for the current version. Sent as X-API-Version.",
+      send: "Send request",
+      sending: "Sending…",
+      signAndSend: "Sign with wallet and send",
+      retryIn: "Rate limited. You can retry in {sec}s. Your input is kept.",
+      resetBody: "Reset body to example",
+      correlationSent: "Correlation ID sent",
+      correlationEchoed: "Correlation ID echoed",
+      versionEchoed: "Version echoed",
+      status: "Status",
+      response: "Response",
+      connectWallet: "Connect wallet",
+      walletConnected: "Wallet {address}",
+      badges: { stateChanging: "Changes state", walletSigned: "Wallet-signed", testnetOnly: "Testnet only", docsOnly: "Docs only" },
+      docsOnly: {
+        multipart_upload: "File uploads are not supported in the console. Use the Forge flow.",
+        needs_built_xdr: "Needs a changeTrust XDR built and signed by the app's trustline flow.",
+        preflight: "CORS preflight. Browsers send it on their own.",
+      },
+      fence: {
+        docs_only: "This operation can't be sent from the console.",
+        network_not_testnet: "Blocked: this build is not on testnet, and state-changing calls only run on testnet.",
+        wallet_required: "Connect a wallet first. This call needs your signature.",
+        wallet_network_mismatch: "Blocked: your wallet is not on testnet. Switch it to Test SDF Network.",
+      },
+      buildErrors: {
+        missing_path_param: "Fill in the path parameter \"{field}\".",
+        invalid_json: "The body is not valid JSON.",
+        body_not_object: "The body must be a JSON object.",
+        unknown_field: "\"{field}\" is not a field this operation accepts.",
+        invalid_jsonrpc: "JSON-RPC bodies need \"jsonrpc\": \"2.0\" and a method.",
+      },
+      kinds: {
+        ok: "Success",
+        jsonrpc_error: "JSON-RPC error inside an HTTP 200 response",
+        x402_shim_disabled: "The x402 local shim is off on this deployment (X402_LOCAL_SHIM_ENABLED is not true). That 503 is expected.",
+        rate_limited: "Rate limited",
+        unavailable: "Service unavailable",
+        version_rejected: "API version not accepted",
+        http_error: "Request failed",
+      },
+      networkError: "Network error. The request did not reach the server.",
+      signFailed: "The wallet did not sign the request.",
+      inputKept: "Your input is kept. Fix it and send again.",
     },
   },
   es: {
@@ -1964,6 +2062,59 @@ export const phaseCopy: Record<
         treasuryLow: "Las recompensas están en pausa mientras se repone la tesorería.",
         identityBlocked: "Esta wallet no es elegible para arcos de misiones.",
       },
+    },
+    playground: {
+      sectionTitle: "Probalo en vivo",
+      intro: "Enviá requests reales a la API de este despliegue. Las llamadas de solo lectura corren tal cual. Las que cambian estado quedan limitadas a testnet, y las que necesitan firma las firma tu wallet en este navegador. El servidor nunca ve una clave.",
+      operation: "Operación",
+      pathParams: "Parámetros de ruta",
+      query: "Parámetros de query",
+      body: "Cuerpo del request (JSON)",
+      apiVersion: "Versión de API",
+      apiVersionHint: "Dejalo vacío para la versión actual. Se envía como X-API-Version.",
+      send: "Enviar request",
+      sending: "Enviando…",
+      signAndSend: "Firmar con la wallet y enviar",
+      retryIn: "Límite de requests. Podés reintentar en {sec}s. Tu entrada se conserva.",
+      resetBody: "Restablecer cuerpo de ejemplo",
+      correlationSent: "ID de correlación enviado",
+      correlationEchoed: "ID de correlación devuelto",
+      versionEchoed: "Versión devuelta",
+      status: "Estado",
+      response: "Respuesta",
+      connectWallet: "Conectar wallet",
+      walletConnected: "Wallet {address}",
+      badges: { stateChanging: "Cambia estado", walletSigned: "Firma con wallet", testnetOnly: "Solo testnet", docsOnly: "Solo documentación" },
+      docsOnly: {
+        multipart_upload: "La consola no admite subir archivos. Usá el flujo de Forge.",
+        needs_built_xdr: "Necesita un XDR changeTrust armado y firmado por el flujo de trustline de la app.",
+        preflight: "Preflight CORS. El navegador lo envía solo.",
+      },
+      fence: {
+        docs_only: "Esta operación no se puede enviar desde la consola.",
+        network_not_testnet: "Bloqueado: este build no está en testnet, y las llamadas que cambian estado solo corren en testnet.",
+        wallet_required: "Conectá una wallet primero. Esta llamada necesita tu firma.",
+        wallet_network_mismatch: "Bloqueado: tu wallet no está en testnet. Cambiala a Test SDF Network.",
+      },
+      buildErrors: {
+        missing_path_param: "Completá el parámetro de ruta \"{field}\".",
+        invalid_json: "El cuerpo no es JSON válido.",
+        body_not_object: "El cuerpo tiene que ser un objeto JSON.",
+        unknown_field: "\"{field}\" no es un campo que acepte esta operación.",
+        invalid_jsonrpc: "Los cuerpos JSON-RPC necesitan \"jsonrpc\": \"2.0\" y un method.",
+      },
+      kinds: {
+        ok: "Éxito",
+        jsonrpc_error: "Error JSON-RPC dentro de una respuesta HTTP 200",
+        x402_shim_disabled: "El shim local de x402 está apagado en este despliegue (X402_LOCAL_SHIM_ENABLED no es true). Ese 503 es esperado.",
+        rate_limited: "Límite de requests",
+        unavailable: "Servicio no disponible",
+        version_rejected: "Versión de API no aceptada",
+        http_error: "El request falló",
+      },
+      networkError: "Error de red. El request no llegó al servidor.",
+      signFailed: "La wallet no firmó el request.",
+      inputKept: "Tu entrada se conserva. Corregila y enviá de nuevo.",
     },
   },
 }

@@ -154,7 +154,7 @@ export const API_OPERATIONS: readonly ApiOperation[] = [
     body: { kind: "json", fields: ["tokenId", "collectionId", "priceStroops", "seller", "cancelId"] },
     statuses: [200, 202, 400, 413],
     stateChanging: true,
-    signing: "wallet",
+    signing: "none",
   },
   {
     id: "market.list",
@@ -192,7 +192,7 @@ export const API_OPERATIONS: readonly ApiOperation[] = [
     },
     statuses: [201, 400],
     stateChanging: true,
-    signing: "wallet",
+    signing: "none",
   },
   {
     id: "signals.list",

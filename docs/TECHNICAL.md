@@ -415,6 +415,7 @@ NEXT_PUBLIC_FEATURE_PHASE_146=1
 NEXT_PUBLIC_FEATURE_PHASE_147=1
 NEXT_PUBLIC_FEATURE_PHASE_148=1
 NEXT_PUBLIC_FEATURE_PHASE_149=1
+NEXT_PUBLIC_FEATURE_PHASE_162=1   # build-time
 NEXT_PUBLIC_FEATURE_PHASE_163=1
 # Server-only aliases also accepted: FEATURE_PHASE_104, etc.
 ```
@@ -434,6 +435,7 @@ Rollback: unset the var or set `0` and restart. No ledger migration to revert; o
 
 | Flag | Scope | Rollback |
 |---|---|---|
+| `phase-162` | Docs playground (spike 662): `/docs` "Try it live" section. Logic in `lib/api-playground.ts`, UI in `components/docs-api-playground.tsx`, operations from `lib/api-contract.ts` | Unset, rebuild, restart. Section disappears, nothing persisted |
 | `phase-163` | API versioning (spike 663): middleware negotiation, version echo, deprecation headers, `/api/versions`. Contract lives in `lib/api-contract.ts`; `npm run api:contract -- --write` regenerates `docs/api/openapi.json` + `changelog.json` | Unset, restart. Headers stop, `/api/versions` 404s. The CI gate is source-only and stays |
 
 ---
