@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from "vitest"
 import { API_OPERATIONS } from "@/lib/api-contract"
 import {
   API_CHANGELOG,
+  API_VARY_TOKENS,
   buildOpenApiDocument,
   checkContract,
   currentApiVersion,
@@ -80,7 +81,7 @@ describe("phase-163 response headers", () => {
   it("echoes the version and Vary on every response", () => {
     expect(versionResponseHeaders("GET", "/api/market", "2026-10-17", { versions: V, deprecations: [] })).toEqual({
       "X-API-Version": "2026-10-17",
-      Vary: "Accept-Version, X-API-Version",
+      Vary: "Accept-Version, X-API-Version, Authorization, Accept-Language, X-Phase-Lang",
     })
   })
 
@@ -109,6 +110,30 @@ describe("phase-163 response headers", () => {
     expect(out.Deprecation).toBe(`@${Date.parse("2026-09-01") / 1000}`)
     expect(out.Link).toBe('</docs#metadata>; rel="deprecation", </api/v2/metadata/{id}>; rel="successor-version"')
     expect(pathMatchesTemplate("/api/metadata/{id}", "/api/metadata/42/extra")).toBe(false)
+  })
+})
+
+describe("phase-163 Vary superset", () => {
+  it("covers every Vary token an /api route sets, so the middleware cannot drop a cache key", () => {
+    const root = path.resolve(__dirname, "../../app/api")
+    const files: string[] = []
+    const walk = (dir: string) => {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, e.name)
+        if (e.isDirectory()) walk(full)
+        else if (/\.(ts|tsx)$/.test(e.name)) files.push(full)
+      }
+    }
+    walk(root)
+    const tokens = new Set<string>()
+    for (const f of files) {
+      for (const m of fs.readFileSync(f, "utf8").matchAll(/Vary["']?\s*:\s*["'`]([^"'`]+)["'`]/g)) {
+        for (const t of m[1].split(",")) tokens.add(t.trim().toLowerCase())
+      }
+    }
+    expect(tokens.size).toBeGreaterThan(0)
+    const covered = new Set(API_VARY_TOKENS.map((t) => t.toLowerCase()))
+    for (const t of tokens) expect(covered.has(t), `Vary token ${t}`).toBe(true)
   })
 })
 

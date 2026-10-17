@@ -18,6 +18,21 @@ import { API_OPERATIONS, type ApiOperation } from "./api-contract"
 
 export const API_VERSION_HEADER = "X-API-Version"
 export const ACCEPT_VERSION_HEADER = "Accept-Version"
+/**
+ * Middleware sets `Vary` on the same response a route may set it on, and the
+ * route's value can be replaced. So this is a superset of every `Vary` token an
+ * `/api` route uses today (gated metadata/IPFS/OG responses vary on
+ * Authorization and language). Dropping one would let a shared cache serve one
+ * viewer's gated response to another. A test scans app/api to keep it complete.
+ */
+export const API_VARY_TOKENS = [
+  "Accept-Version",
+  "X-API-Version",
+  "Authorization",
+  "Accept-Language",
+  "X-Phase-Lang",
+] as const
+
 /** Set by middleware on the forwarded request; handlers read it, clients never send it. */
 export const FORWARDED_API_VERSION_HEADER = "x-phase-api-version"
 
@@ -175,7 +190,7 @@ export function versionResponseHeaders(
   const deprecations = opts.deprecations ?? ROUTE_DEPRECATIONS
   const out: Record<string, string> = {
     [API_VERSION_HEADER]: version,
-    Vary: `${ACCEPT_VERSION_HEADER}, ${API_VERSION_HEADER}`,
+    Vary: API_VARY_TOKENS.join(", "),
   }
   const links: string[] = []
 
