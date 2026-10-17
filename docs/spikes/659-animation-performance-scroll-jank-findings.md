@@ -14,7 +14,7 @@ Global Lenis + ScrollTrigger + a gsap ticker rAF run on every route, the hero sc
 - `tactical-command.css` set `will-change: transform, opacity, box-shadow, filter` permanently on five classes. Eighteen infinite loops animated `box-shadow`, `border-color`, `filter`, `color` or `background-position`.
 - The ticker shipped inline `will-change: transform` and ignored reduced motion. Skeletons (`animate-pulse`) ignored it too.
 
-## Delivered (phase-159)
+## Delivered in this PR (phase-159)
 
 One switch: the root layout stamps `data-phase-motion="lean"` on `<html>` when `NEXT_PUBLIC_FEATURE_PHASE_159` is set. Every CSS override sits under that attribute selector and every JS branch reads the same value, so with the flag off the attribute is absent and the old code path runs untouched.
 
@@ -32,21 +32,67 @@ One switch: the root layout stamps `data-phase-motion="lean"` on `<html>` when `
 | `components/draw-text.tsx` | No importer anywhere in `app/` or `components/`, so it never ships in a route bundle and costs nothing at runtime. Candidate for deletion in a cleanup PR, not a perf fix. |
 | `components/scramble-text.tsx` | Same: `ScrambleText` and `ScrambleTextOnHover` have no importers. |
 | `app/explore/page.tsx` | Its jank sources were the global Lenis ticker (now skipped on `/explore` in lean mode) and the `animate-pulse` skeletons (now frozen under reduced motion by the scoped CSS). Nothing in the page itself needs to change. |
-| `package.json` | No dependency change. Lenis, gsap and framer-motion stay because the flag-off path still uses them, and removing them would break rollback. |
 
-## Spike questions
+`package.json` is changed only to add the `proof:659` script. There's no dependency change: Lenis, gsap and framer-motion stay because the flag-off path still uses them.
 
-The upstream issue text was not reachable from the session that built this, so these follow the summary it was given.
+## Spike questions (from the issue)
 
-1. **Rollback?** Unset `NEXT_PUBLIC_FEATURE_PHASE_159`, rebuild and restart. The attribute disappears and every scoped rule goes inert. No data is written.
-2. **WASM or contract migration?** Does not apply. This spike touches no contract, storage or API.
-3. **Metrics?** None added. Animation timing is a client concern and the repo has no RUM pipeline; adding one is out of scope. Verification is by trace (below).
-4. **Tests?** `lib/__tests__/motion-performance.test.ts` covers route scoping, the build flag, reduced-motion and scroll-timeline probes, the flap schedule (legacy timing parity), transient `will-change` cleanup on finish and cancel, and a CSS guard: every lean rule must be scoped to the attribute and lean keyframes / `will-change` may only use `transform` and `opacity`.
-5. **Security or PII?** No new data flow. The flap audio still needs an explicit unmute.
+The issue's five questions are the shared template for this batch, written around signing, CAS and failover. Here's how each one applies to an animation-only change.
 
-## Still needs manual or device verification
+1. **Minimal testnet loop, and which listed files can break it?** The loop's last step is "display". Motion code can't touch funding, settlement or indexing, but it can break display. `components/smooth-scroll.tsx` (a stuck ticker or Lenis fighting a nested scroller) and `components/split-flap-text.tsx` (the H1 on the landing page) can each break the display step on their own. `app/layout.tsx` stamps the attribute every CSS override depends on. While building this, a separate pre-existing crash surfaced: `lib/stellar-wallet-kit.ts` broke hydration on every page. It's fixed on `chore/fix-main-baseline`, which this branch includes.
+2. **Replay and idempotency per write.** Not applicable: this spike adds no writes. The only state is the per-viewer flap audio mute toggle, which lives in React state and isn't persisted.
+3. **Contract-ID drift, issuer rotation, gateway failover.** Not applicable. The ticker's live stats (Horizon, Soroban RPC, CoinGecko, timeapi) already fail soft to `—`. Note that the app's CSP blocks CoinGecko and timeapi, so those two values never load in the browser (pre-existing, recorded in the baseline notes).
+4. **409/429/412 taxonomy and recovery without losing input.** Not applicable: no requests or forms are added.
+5. **Migration and rollback.** No WASM, schema or data change. `NEXT_PUBLIC_FEATURE_PHASE_159` is inlined at build time, so rollback is unset, **rebuild**, redeploy. Without the attribute, every lean CSS rule is inert and the legacy JS paths run. The teardown fix stays on either way because it's a leak fix.
 
-- Chrome Performance traces on a low-end Android device, flag off vs on, for `/` and `/explore` (long tasks, dropped frames, LCP). None were captured here and none are claimed.
-- Visual check that the opacity pulse reads well enough on `.tactical-btn-x402` and `.forge-cta-pulse` compared to the old glow.
-- Safari, which lacks `animation-timeline`, should show the gsap fallback for the hero.
-- Hydration: `NEXT_PUBLIC_FEATURE_PHASE_159` is inlined at build time, so the flag needs a rebuild, not just a restart, to flip the H1 render path. `FEATURE_PHASE_159` alone does nothing for this flag.
+## Acceptance criteria status
+
+| Criterion | Status |
+|---|---|
+| End-to-end testnet proof with tx hashes | Not applicable to motion. The equivalent proof is the Lighthouse before/after below (placeholders). |
+| Concurrency proof | Not applicable. |
+| Abuse proof | Not applicable. |
+| Resilience proof | Not applicable. Reduced motion is covered in the checklist. |
+| i18n, `#13`, docs, flag row | No new UI strings, `#13` untouched, flag row in `PROJECT_ARCHITECTURE.md` §10 and `docs/TECHNICAL.md`. |
+| No regression with flags off | tsc 0 errors, vitest green, and a CSS guard test proves every lean rule is attribute-scoped (inert with the flag off). |
+
+## Verified in this session
+
+Headless Chromium against `next dev` with `NEXT_PUBLIC_FEATURE_PHASE_159=1`:
+
+| Check | Normal motion | `prefers-reduced-motion: reduce` |
+|---|---|---|
+| `<html data-phase-motion>` | `lean` | `lean` |
+| Final H1 glyphs in the server HTML | yes | yes |
+| Lenis on `/` | on | off |
+| Hero on the CSS scroll timeline | yes | no (static) |
+| Ticker animation / `will-change` | running / `auto` | `none` / `auto` |
+| Page errors | none | none |
+
+On `/explore`, Lenis is off. `npm run proof:659` was run once against the dev server to check the script works. Dev-mode numbers aren't representative, so none are reported here.
+
+## Live proof checklist (run by the maintainer)
+
+1. Make two production builds of this branch: **A** without `NEXT_PUBLIC_FEATURE_PHASE_159`, **B** with `NEXT_PUBLIC_FEATURE_PHASE_159=1` (Vercel previews or `next build && next start` on two ports).
+2. `npm run proof:659 -- --base-url <A> --label off --runs 5`, then `npm run proof:659 -- --base-url <B> --label on --runs 5`. The script refuses a mislabeled build.
+3. `npm run proof:659 -- --compare .data/proofs/659-off.json .data/proofs/659-on.json` and paste the table below.
+4. Low-end Android trace: on a real device (or Chrome DevTools, Performance, CPU 6x slowdown), record 10 s of scrolling `/` on A and on B, then note long tasks over 50 ms and dropped frames.
+5. Reduced motion: in DevTools, Rendering, set "Emulate CSS prefers-reduced-motion: reduce" on B and confirm the H1 shows `PHASE` with no scramble, the ticker is still, skeletons on `/explore` don't pulse, and scrolling `/` has no smoothing or hero fade.
+6. Fill in:
+
+| Item | Value |
+|---|---|
+| Build A URL (flag off) | `<<PASTE>>` |
+| Build B URL (flag on) | `<<PASTE>>` |
+| `proof:659 --compare` table | `<<PASTE TABLE>>` |
+| Device / CPU throttle used for the trace | `<<PASTE>>` |
+| Long tasks > 50 ms while scrolling `/` (A vs B) | `<<PASTE>>` |
+| Dropped frames while scrolling `/` (A vs B) | `<<PASTE>>` |
+| Reduced-motion check passed (yes/no + screenshot) | `<<PASTE>>` |
+
+## Follow-up / out of scope for this PR
+
+- Delete `components/draw-text.tsx` and `components/scramble-text.tsx` (dead code).
+- The ticker re-renders every entry once a second for the EST clock; isolating the clock would cut that work.
+- Allow (or drop) CoinGecko and timeapi in the CSP so the ticker's price and time load.
+- RUM for LCP/INP in production; there's no metrics pipeline today.
