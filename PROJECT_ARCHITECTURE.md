@@ -132,6 +132,7 @@ Owns:
 - Tactical animation classes use GPU compositing hints where flicker/pulse is intentional.
 - Keep animations isolated to key controls; avoid broad repaint cascades.
 - Prefer CSS primitives and avoid JS-driven animation loops unless required for state logic.
+- With `phase-159` on, lean motion applies: smooth scroll is route-scoped, infinite loops animate only `transform`/`opacity`, `will-change` is set only while an animation runs, and `prefers-reduced-motion` stops non-essential motion. All overrides are scoped to `html[data-phase-motion="lean"]` (see `docs/spikes/659-animation-performance-scroll-jank-findings.md`).
 
 ## 9) Security architecture
 
@@ -199,6 +200,7 @@ is a fixed-size digest of the canonical payload, keeping it under wallet
 | `phase-144` | `NEXT_PUBLIC_FEATURE_PHASE_144` / `FEATURE_PHASE_144` | ve-PHASELQ time-locked governance escrow with pro-rata treasury fee-share distribution | off | Unset var, restart — governance ve-lock route returns 404, SQLite ve rows remain inert |
 | `phase-145` | `NEXT_PUBLIC_FEATURE_PHASE_145` / `FEATURE_PHASE_145` | Gauge voting for quest emissions with ve-weight directing collection quest budgets | off | Unset var, restart — gauge route returns 404, SQLite vote rows remain inert |
 | `phase-154` | `NEXT_PUBLIC_FEATURE_PHASE_154` / `FEATURE_PHASE_154` | Outbound webhook subscriptions: admin-managed subscriber endpoints with per-endpoint HMAC secrets and signed, retried event delivery (`settle.verified`, `market.offer_accepted`, `faucet.claim_completed`). Partial slice of spike 664 (issue #527) — no production event wiring, SSRF fencing, or redelivery UI yet | off | Unset var, restart — admin routes return 404; `webhook-subscriptions.json` rows remain inert, no migration to undo |
+| `phase-159` | `NEXT_PUBLIC_FEATURE_PHASE_159` (build-time; `FEATURE_PHASE_159` alone has no effect) | Lean motion (spike 659 / #522): root layout stamps `data-phase-motion="lean"`; Lenis only on `/`, hero fade on a CSS scroll timeline with gsap fallback, batched `ScrollTrigger.batch` reveals, server-rendered H1 with a WAAPI flap, compositor-only loops, transient `will-change`, reduced motion honored by ticker/skeletons/flap/smooth scroll | off | Unset var, rebuild and restart — attribute is absent, scoped CSS goes inert, legacy animation paths run; no data written |
 
 Flags are read via `lib/feature-flags.ts:isFeatureEnabled`. Client flags use `NEXT_PUBLIC_*`, server also accepts `FEATURE_*`. Zero regression when off.
 

@@ -8,21 +8,20 @@ import Lenis from "lenis"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
-gsap.registerPlugin(ScrollTrigger)
+import { isLeanMotion, prefersReducedMotion, smoothScrollAllowed } from "@/lib/motion-performance"
 
-/** Cockpit pages scroll inside `main` / fixed panels, not the document — Lenis fights nested overflow. */
-function lenisDisabledForPath(pathname: string | null): boolean {
-  if (!pathname) return false
-  return pathname === "/forge" || pathname === "/chamber"
-}
+gsap.registerPlugin(ScrollTrigger)
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const lenisRef = useRef<Lenis | null>(null)
-  const skip = lenisDisabledForPath(pathname)
+  // phase-159: lean mode runs Lenis only on routes with scroll-driven sections
+  // and never under prefers-reduced-motion. Legacy mode skips only the cockpits.
+  const lean = isLeanMotion()
+  const allowed = smoothScrollAllowed(pathname, lean) && !(lean && prefersReducedMotion())
 
   useEffect(() => {
-    if (skip) return
+    if (!allowed) return
 
     const lenis = new Lenis({
       duration: 1.2,
@@ -35,18 +34,24 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
 
     lenis.on("scroll", ScrollTrigger.update)
 
-    gsap.ticker.add((time) => {
+    // Keep a named reference: removing `lenis.raf` never matched the anonymous
+    // callback, so every route change used to leave a dead ticker entry behind.
+    const tick = (time: number) => {
       lenis.raf(time * 1000)
-    })
+    }
+    gsap.ticker.add(tick)
 
     gsap.ticker.lagSmoothing(0)
 
     return () => {
+      gsap.ticker.remove(tick)
+      gsap.ticker.lagSmoothing(500, 33)
+      lenis.off("scroll", ScrollTrigger.update)
       lenis.destroy()
-      gsap.ticker.remove(lenis.raf)
       lenisRef.current = null
+      if (lean) ScrollTrigger.refresh()
     }
-  }, [skip])
+  }, [allowed, lean])
 
   return <>{children}</>
 }

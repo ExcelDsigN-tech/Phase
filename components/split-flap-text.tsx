@@ -4,6 +4,13 @@ import type React from "react"
 import { motion } from "framer-motion"
 import { useMemo, useState, useCallback, useEffect, useRef, createContext, useContext } from "react"
 import { Volume2, VolumeX } from "lucide-react"
+import {
+  buildFlapSchedule,
+  flapAudioAllowed,
+  leanMotionFlag,
+  prefersReducedMotion,
+  withTransientWillChange,
+} from "@/lib/motion-performance"
 
 interface AudioContextType {
   isMuted: boolean
@@ -24,7 +31,7 @@ export function SplitFlapAudioProvider({ children }: { children: React.ReactNode
   const getAudioContext = useCallback(() => {
     if (typeof window === "undefined") return null
     if (!audioContextRef.current) {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
+      const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
       if (AudioContextClass) {
         audioContextRef.current = new AudioContextClass()
       }
@@ -167,7 +174,122 @@ function SplitFlapTextInner({ text, className = "", speed = 50 }: SplitFlapTextP
 }
 
 export function SplitFlapText(props: SplitFlapTextProps) {
+  if (leanMotionFlag()) return <LeanSplitFlapText {...props} />
   return <SplitFlapTextInner {...props} />
+}
+
+/**
+ * phase-159: the H1 renders its final glyphs on the server (nothing to wait for
+ * at LCP), then scrambles by writing `textContent` directly, so no React render
+ * runs per frame. The settle flip is one WAAPI transform with `will-change` set
+ * only while it plays. Reduced motion skips the scramble, the flip and the audio.
+ */
+function LeanSplitFlapText({ text, className = "", speed = 50 }: SplitFlapTextProps) {
+  const chars = useMemo(() => text.toUpperCase().split(""), [text])
+  const tileRefs = useRef<(HTMLSpanElement | null)[]>([])
+  const stopRef = useRef<(() => void) | null>(null)
+  const audio = useSplitFlapAudio()
+  const audioRef = useRef(audio)
+  useEffect(() => {
+    audioRef.current = audio
+  }, [audio])
+
+  const run = useCallback(
+    (replay: boolean) => {
+      stopRef.current?.()
+      const reduced = prefersReducedMotion()
+      const timers: ReturnType<typeof setTimeout>[] = []
+      const intervals: ReturnType<typeof setInterval>[] = []
+      const anims: Animation[] = []
+
+      for (const step of buildFlapSchedule(text, { replay, reducedMotion: reduced })) {
+        const el = tileRefs.current[step.index]
+        if (!el) continue
+        const finalChar = CHARSET.includes(step.char) ? step.char : "\u00A0"
+        if (step.flips === 0) {
+          el.textContent = finalChar
+          continue
+        }
+        timers.push(
+          setTimeout(() => {
+            let flip = 0
+            const id = setInterval(() => {
+              if (flip >= step.flips) {
+                clearInterval(id)
+                el.textContent = finalChar
+                if (typeof el.animate === "function") {
+                  anims.push(
+                    withTransientWillChange(el, ["transform"], () =>
+                      el.animate([{ transform: "rotateX(-90deg)" }, { transform: "rotateX(0deg)" }], {
+                        duration: 250,
+                        easing: "cubic-bezier(0.22, 0.61, 0.36, 1)",
+                      }),
+                    ),
+                  )
+                }
+                const a = audioRef.current
+                if (a && flapAudioAllowed(a.isMuted, reduced)) a.playClick()
+                return
+              }
+              el.textContent = CHARSET[Math.floor(Math.random() * CHARSET.length)]
+              flip++
+            }, speed)
+            intervals.push(id)
+          }, step.startDelayMs),
+        )
+      }
+
+      const stop = () => {
+        timers.forEach(clearTimeout)
+        intervals.forEach(clearInterval)
+        anims.forEach((anim) => anim.cancel())
+        chars.forEach((c, i) => {
+          const el = tileRefs.current[i]
+          if (el) el.textContent = CHARSET.includes(c) ? c : "\u00A0"
+        })
+      }
+      stopRef.current = stop
+      return stop
+    },
+    [text, chars, speed],
+  )
+
+  useEffect(() => {
+    const stop = run(false)
+    return () => {
+      stop()
+      stopRef.current = null
+    }
+  }, [run])
+
+  const displayFontSize = "clamp(2.35rem, 4.25vw + 1.35rem, 6.25rem)"
+
+  return (
+    <div
+      className={`inline-flex shrink-0 flex-nowrap gap-[0.06em] sm:gap-[0.08em] items-center cursor-pointer font-[family-name:var(--font-bebas)] ${className}`}
+      aria-label={text}
+      onMouseEnter={() => run(true)}
+      style={{ perspective: "1000px", fontSize: displayFontSize }}
+    >
+      {chars.map((char, index) =>
+        char === " " ? (
+          <span key={index} aria-hidden style={{ width: "0.3em" }} />
+        ) : (
+          <span
+            key={index}
+            aria-hidden
+            ref={(el) => {
+              tileRefs.current[index] = el
+            }}
+            className="phase-flap-tile inline-flex shrink-0 items-center justify-center leading-none"
+            style={{ width: "0.68em", height: "1.05em", color: "#ffffff" }}
+          >
+            {CHARSET.includes(char) ? char : "\u00A0"}
+          </span>
+        ),
+      )}
+    </div>
+  )
 }
 
 interface SplitFlapCharProps {
@@ -194,12 +316,12 @@ function SplitFlapChar({ char, index, animationKey, skipEntrance, speed, playCli
     if (intervalRef.current) clearInterval(intervalRef.current)
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
 
-    if (isSpace) {
-      setCurrentChar(" ")
-      setIsSettled(true)
-      return
-    }
+    // Space tiles render a fixed spacer and never read currentChar / isSettled.
+    if (isSpace) return
 
+    // Legacy path, kept frame-identical while phase-159 is off. The lean path
+    // (LeanSplitFlapText) has no per-frame React state at all.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsSettled(false)
     setCurrentChar(CHARSET[Math.floor(Math.random() * CHARSET.length)])
 

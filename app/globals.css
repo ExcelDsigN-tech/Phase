@@ -630,3 +630,42 @@
     animation: none !important;
   }
 }
+
+/* ─── phase-159 (spike 659): lean motion. Inert unless <html data-phase-motion="lean"> ─── */
+html[data-phase-motion="lean"] :is(
+    .forge-shell--deploying,
+    .design-studio-seal-pulse,
+    .phase-artifact-decrypt-overlay span,
+    .token-icon-pulse,
+    .forge-x402-blink
+  ) {
+  animation-name: phase-lean-pulse;
+}
+
+/* Hero fade runs on a scroll timeline (compositor) instead of a gsap scrub. */
+@keyframes phase-hero-scroll-fade {
+  to {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  html[data-phase-motion="lean"] .phase-hero-scroll-fade {
+    animation: phase-hero-scroll-fade linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 100dvh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-phase-motion="lean"] :is(
+      .animate-pulse,
+      .phase-hero-scroll-fade,
+      .design-studio-seal-pulse,
+      .phase-artifact-decrypt-overlay span,
+      .token-icon-pulse
+    ) {
+    animation: none;
+  }
+}

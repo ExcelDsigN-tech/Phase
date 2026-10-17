@@ -7,6 +7,8 @@ import { pickLandingCopy } from "@/lib/landing-copy"
 import { cn } from "@/lib/utils"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { isLeanMotion, prefersReducedMotion } from "@/lib/motion-performance"
+import { batchReveal } from "@/lib/motion-reveal"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -29,6 +31,19 @@ export function ColophonSection() {
     if (!sectionRef.current) return
 
     const ctx = gsap.context(() => {
+      // phase-159: batched compositor-only reveals; reduced motion stays static.
+      if (isLeanMotion()) {
+        if (prefersReducedMotion()) return
+        batchReveal([headerRef.current].filter(Boolean) as Element[], { x: -60 })
+        batchReveal(
+          [...(gridRef.current?.querySelectorAll(":scope > div") ?? []), footerRef.current].filter(
+            Boolean,
+          ) as Element[],
+          { y: 40 },
+        )
+        return
+      }
+
       // Header slide in
       if (headerRef.current) {
         gsap.from(headerRef.current, {

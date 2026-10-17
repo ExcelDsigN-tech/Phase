@@ -4,6 +4,7 @@ import { IBM_Plex_Sans, IBM_Plex_Mono, Bebas_Neue, Orbitron } from "next/font/go
 import { Analytics } from "@vercel/analytics/next"
 import { AppProviders } from "@/components/app-providers"
 import { SmoothScroll } from "@/components/smooth-scroll"
+import { LEAN_MOTION_ATTR, LEAN_MOTION_VALUE, leanMotionFlag } from "@/lib/motion-performance"
 import "./globals.css"
 
 const PRODUCTION_SITE = "https://www.phasee.xyz"
@@ -105,8 +106,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // phase-159: one server-side switch for the lean motion CSS and client paths.
+  const motionAttr = leanMotionFlag() ? { [LEAN_MOTION_ATTR]: LEAN_MOTION_VALUE } : {}
   return (
-    <html lang="en" className="dark bg-background" suppressHydrationWarning>
+    <html lang="en" className="dark bg-background" suppressHydrationWarning {...motionAttr}>
       <body
         className={`${ibmPlexSans.variable} ${bebasNeue.variable} ${ibmPlexMono.variable} ${orbitron.variable} font-sans antialiased overflow-x-hidden`}
       >

@@ -6,6 +6,8 @@ import { useLang } from "@/components/lang-context"
 import { pickLandingCopy } from "@/lib/landing-copy"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { isLeanMotion, prefersReducedMotion } from "@/lib/motion-performance"
+import { batchReveal } from "@/lib/motion-reveal"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -25,11 +27,23 @@ export function SignalsSection() {
 
     const section = sectionRef.current
     const cursor = cursorRef.current
+    const lean = isLeanMotion()
+    if (lean && prefersReducedMotion()) return
+
+    // phase-159: reuse two quickTo setters instead of allocating a tween per mousemove.
+    const moveX = lean ? gsap.quickTo(cursor, "x", { duration: 0.5, ease: "power3.out" }) : null
+    const moveY = lean ? gsap.quickTo(cursor, "y", { duration: 0.5, ease: "power3.out" }) : null
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = section.getBoundingClientRect()
       const x = e.clientX - rect.left
       const y = e.clientY - rect.top
+
+      if (moveX && moveY) {
+        moveX(x)
+        moveY(y)
+        return
+      }
 
       gsap.to(cursor, {
         x: x,
@@ -50,6 +64,7 @@ export function SignalsSection() {
       section.removeEventListener("mousemove", handleMouseMove)
       section.removeEventListener("mouseenter", handleMouseEnter)
       section.removeEventListener("mouseleave", handleMouseLeave)
+      if (lean) gsap.killTweensOf(cursor)
     }
   }, [])
 
@@ -57,6 +72,14 @@ export function SignalsSection() {
     if (!sectionRef.current || !headerRef.current || !cardsRef.current) return
 
     const ctx = gsap.context(() => {
+      // phase-159: batched compositor-only reveals; reduced motion stays static.
+      if (isLeanMotion()) {
+        if (prefersReducedMotion()) return
+        batchReveal([headerRef.current!], { x: -60 })
+        batchReveal(cardsRef.current?.querySelectorAll("article"), { x: -100 }, { stagger: 0.2 })
+        return
+      }
+
       // Header slide in from left
       gsap.fromTo(
         headerRef.current,

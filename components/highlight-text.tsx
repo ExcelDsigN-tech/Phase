@@ -3,6 +3,7 @@
 import { useRef, useEffect, type ReactNode } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { isLeanMotion, prefersReducedMotion } from "@/lib/motion-performance"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -20,7 +21,15 @@ export function HighlightText({ children, className = "", parallaxSpeed = 0.3 }:
   useEffect(() => {
     if (!containerRef.current || !highlightRef.current || !textRef.current) return
 
+    const lean = isLeanMotion()
     const ctx = gsap.context(() => {
+      // phase-159: reduced motion shows the settled highlight with no triggers.
+      if (lean && prefersReducedMotion()) {
+        gsap.set(highlightRef.current, { scaleX: 1, transformOrigin: "left center" })
+        gsap.set(textRef.current, { color: "#000000" })
+        return
+      }
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
@@ -57,7 +66,8 @@ export function HighlightText({ children, className = "", parallaxSpeed = 0.3 }:
         0.5,
       )
 
-      // Parallax effect
+      // Parallax effect. phase-159 drops it: a scrub per highlight ran on every scroll frame.
+      if (lean) return
       gsap.to(highlightRef.current, {
         yPercent: -20 * parallaxSpeed,
         scrollTrigger: {

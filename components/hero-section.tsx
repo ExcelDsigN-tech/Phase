@@ -6,9 +6,9 @@ import { useWallet } from "@/components/wallet-provider"
 import { useLang, type AppLang } from "@/components/lang-context"
 import { pickLandingCopy } from "@/lib/landing-copy"
 import Link from "next/link"
-import { FusionAtmosphere } from "@/components/fusion-atmosphere"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { isLeanMotion, prefersReducedMotion, supportsScrollTimeline } from "@/lib/motion-performance"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -58,6 +58,17 @@ export function HeroSection() {
 
   useEffect(() => {
     if (!sectionRef.current || !contentRef.current) return
+
+    // phase-159: the LCP section fades on the compositor via a CSS scroll
+    // timeline; the gsap scrub stays as the fallback for older engines.
+    if (isLeanMotion()) {
+      if (prefersReducedMotion()) return
+      if (supportsScrollTimeline()) {
+        const el = contentRef.current
+        el.classList.add("phase-hero-scroll-fade")
+        return () => el.classList.remove("phase-hero-scroll-fade")
+      }
+    }
 
     const ctx = gsap.context(() => {
       gsap.to(contentRef.current, {

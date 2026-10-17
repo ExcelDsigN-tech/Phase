@@ -6,6 +6,8 @@ import { useLang } from "@/components/lang-context"
 import { pickLandingCopy } from "@/lib/landing-copy"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { isLeanMotion, prefersReducedMotion } from "@/lib/motion-performance"
+import { batchReveal } from "@/lib/motion-reveal"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -22,6 +24,16 @@ export function PrinciplesSection() {
     if (!sectionRef.current || !headerRef.current || !principlesRef.current) return
 
     const ctx = gsap.context(() => {
+      // phase-159: batched compositor-only reveals; reduced motion stays static.
+      if (isLeanMotion()) {
+        if (prefersReducedMotion()) return
+        const items = Array.from(principlesRef.current?.querySelectorAll("article") ?? [])
+        batchReveal([headerRef.current!], { x: -60 })
+        batchReveal(items.filter((_, i) => principles[i]?.align !== "right"), { x: -80 }, { start: "top 85%" })
+        batchReveal(items.filter((_, i) => principles[i]?.align === "right"), { x: 80 }, { start: "top 85%" })
+        return
+      }
+
       // Header slide in
       gsap.from(headerRef.current, {
         x: -60,

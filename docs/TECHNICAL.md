@@ -414,6 +414,7 @@ NEXT_PUBLIC_FEATURE_PHASE_146=1
 NEXT_PUBLIC_FEATURE_PHASE_147=1
 NEXT_PUBLIC_FEATURE_PHASE_148=1
 NEXT_PUBLIC_FEATURE_PHASE_149=1
+NEXT_PUBLIC_FEATURE_PHASE_159=1   # build-time: needs a rebuild to flip
 # Server-only aliases also accepted: FEATURE_PHASE_104, etc.
 ```
 
@@ -429,6 +430,10 @@ Agent tuning (all optional, server-only):
 | `PHASE_QUEST_ARC_MAX_STROOPS` | `150000000` (15 PHASELQ) | per-arc reward cap |
 
 Rollback: unset the var or set `0` and restart. No ledger migration to revert; off-chain stores remain but are ignored when flag off. See `PROJECT_ARCHITECTURE.md` §10.
+
+| Flag | Scope | Rollback |
+|---|---|---|
+| `phase-159` | Lean motion (spike 659): route-scoped Lenis, CSS scroll-timeline hero, batched reveals, WAAPI flap, compositor-only loops, reduced-motion support. Client-visible, so only `NEXT_PUBLIC_FEATURE_PHASE_159` counts | Unset, rebuild, restart. Scoped CSS goes inert, legacy paths run, nothing persisted |
 
 ---
 

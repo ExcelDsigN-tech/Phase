@@ -230,6 +230,16 @@ const TICKER_CSS = `
   .phase-ticker-track:hover {
     animation-play-state: paused;
   }
+  /* phase-159: the marquee is already a transform animation, so the permanent
+     layer hint only costs memory; reduced motion freezes it. */
+  html[data-phase-motion="lean"] .phase-ticker-track {
+    will-change: auto;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html[data-phase-motion="lean"] .phase-ticker-track {
+      animation: none;
+    }
+  }
 `
 
 // ── Component ──────────────────────────────────────────────────────────────────
@@ -240,14 +250,11 @@ export function SystemTicker() {
 
   // EST time: initial API sync + tick every second + re-sync every 5 min
   useEffect(() => {
-    let tickId: ReturnType<typeof setInterval>
-    let syncId: ReturnType<typeof setInterval>
-
     syncEstOffset()
       .then(() => { if (estOffsetReady) setLiveTime(computeEstTime()) })
       .catch(() => {})
-    syncId = setInterval(() => { syncEstOffset().catch(() => {}) }, 5 * 60_000)
-    tickId = setInterval(() => { if (estOffsetReady) setLiveTime(computeEstTime()) }, 1_000)
+    const syncId = setInterval(() => { syncEstOffset().catch(() => {}) }, 5 * 60_000)
+    const tickId = setInterval(() => { if (estOffsetReady) setLiveTime(computeEstTime()) }, 1_000)
 
     return () => { clearInterval(tickId); clearInterval(syncId) }
   }, [])

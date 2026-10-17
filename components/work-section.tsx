@@ -6,6 +6,8 @@ import { useLang } from "@/components/lang-context"
 import { pickLandingCopy } from "@/lib/landing-copy"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { isLeanMotion, prefersReducedMotion } from "@/lib/motion-performance"
+import { batchReveal } from "@/lib/motion-reveal"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -21,6 +23,14 @@ export function WorkSection() {
     if (!sectionRef.current || !headerRef.current || !gridRef.current) return
 
     const ctx = gsap.context(() => {
+      // phase-159: batched compositor-only reveals; reduced motion stays static.
+      if (isLeanMotion()) {
+        if (prefersReducedMotion()) return
+        batchReveal([headerRef.current!], { x: -60 }, { start: "top 90%" })
+        batchReveal(gridRef.current?.querySelectorAll("article"), { y: 60 }, { start: "top 90%" })
+        return
+      }
+
       // Header slide in from left
       gsap.fromTo(
         headerRef.current,
@@ -112,6 +122,8 @@ function WorkCard({
       ScrollTrigger.create({
         trigger: cardRef.current,
         start: "top 80%",
+        // phase-159: the trigger only ever fires once, so let it kill itself.
+        once: isLeanMotion(),
         onEnter: () => setIsScrollActive(true),
       })
     }, cardRef)
