@@ -187,6 +187,7 @@ settlement verifier and must not accept unsigned base64 payloads.
 | `phase-143` | `GET/POST /api/notifications/winback` | AI-driven churn and winback: dormancy tier classification, tailored return hooks, randomized experiment cohorts, and 7-day fatigue caps | `404` disabled |
 | `phase-144` | `GET/POST /api/governance/ve-lock` | ve-PHASELQ time-locked governance escrow: decaying lock weight (`1-208` weeks), pro-rata treasury fee-share distribution, and claims | `404` disabled |
 | `phase-145` | `GET/POST /api/governance/gauge` | Gauge voting for emissions: ve-weight-proportional votes directing weekly quest budget allocations across collections | `404` disabled |
+| `phase-163` | `/api/*` (middleware), `GET /api/versions` | Version negotiation: `X-API-Version` pins, `Accept-Version` picks the first supported id, none means current. Echoes `X-API-Version` + `Vary`; unknown → `406 {error:"UNSUPPORTED_API_VERSION",requested,supported}`, sunset → `410 API_VERSION_SUNSET`; `Deprecation`/`Sunset`/`Link` from `ROUTE_DEPRECATIONS`. `/api/versions?format=openapi` serves the contract | No version headers; `/api/versions` `404` |
 
 ### 5.3 Signal concurrency contract
 
@@ -414,6 +415,7 @@ NEXT_PUBLIC_FEATURE_PHASE_146=1
 NEXT_PUBLIC_FEATURE_PHASE_147=1
 NEXT_PUBLIC_FEATURE_PHASE_148=1
 NEXT_PUBLIC_FEATURE_PHASE_149=1
+NEXT_PUBLIC_FEATURE_PHASE_163=1
 # Server-only aliases also accepted: FEATURE_PHASE_104, etc.
 ```
 
@@ -429,6 +431,10 @@ Agent tuning (all optional, server-only):
 | `PHASE_QUEST_ARC_MAX_STROOPS` | `150000000` (15 PHASELQ) | per-arc reward cap |
 
 Rollback: unset the var or set `0` and restart. No ledger migration to revert; off-chain stores remain but are ignored when flag off. See `PROJECT_ARCHITECTURE.md` §10.
+
+| Flag | Scope | Rollback |
+|---|---|---|
+| `phase-163` | API versioning (spike 663): middleware negotiation, version echo, deprecation headers, `/api/versions`. Contract lives in `lib/api-contract.ts`; `npm run api:contract -- --write` regenerates `docs/api/openapi.json` + `changelog.json` | Unset, restart. Headers stop, `/api/versions` 404s. The CI gate is source-only and stays |
 
 ---
 
@@ -474,7 +480,7 @@ Contract commands are documented in [`contracts/README.md`](../contracts/README.
 `.github/workflows/ci.yml` runs on every PR and push to `main`:
 
 - `contracts` — compiles and tests both Soroban crates (`mock-token`, `phase-protocol`) against `wasm32-unknown-unknown`.
-- `web` — `npm run lint` (non-blocking: 286 pre-existing errors), `npm run typecheck` and `npm test` (both blocking), and `npm run build`.
+- `web` — `npm run api:contract` (blocking; diffs the generated OpenAPI contract against the target branch snapshot, exit 1 on an unversioned breaking change, 2 on a stale snapshot), `npm run lint` (non-blocking: 286 pre-existing errors), `npm run typecheck` and `npm test` (both blocking), and `npm run build`.
 - `deploy-staging` — on push to `main` only, behind a `staging` GitHub environment: builds + optimizes `phase-protocol` and runs `scripts/deploy-phase-sep50.ts` against testnet using repo secrets/vars.
 
 ---

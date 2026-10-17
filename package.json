@@ -20,7 +20,8 @@
     "start": "next start",
     "security:audit": "npm audit --audit-level=high",
     "security:secret-rotation": "tsx scripts/check-secret-rotation.ts",
-    "migrate:sqlite": "tsx scripts/migrate-json-to-sqlite.ts"
+    "migrate:sqlite": "tsx scripts/migrate-json-to-sqlite.ts",
+    "api:contract": "tsx scripts/api-contract.cts"
   },
   "dependencies": {
     "@albedo-link/intent": "0.12.0",

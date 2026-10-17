@@ -45,6 +45,21 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
+      - name: API contract (breaking-change gate, spike 663)
+        # Breaking changes are measured against the target branch snapshot, so a
+        # regenerated docs/api/openapi.json cannot hide them. Exit 1 = breaking
+        # without a version bump + changelog entry, exit 2 = stale snapshot.
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          BASE_ARGS=""
+          if [ -n "$BASE_REF" ]; then
+            git fetch --no-tags --depth=1 origin "$BASE_REF"
+            if git show "origin/$BASE_REF:docs/api/openapi.json" > "$RUNNER_TEMP/openapi-base.json" 2>/dev/null; then
+              BASE_ARGS="--base $RUNNER_TEMP/openapi-base.json"
+            fi
+          fi
+          npm run api:contract -- $BASE_ARGS
       - name: Lint
         # eslint had no config/devDependency before this change (npm run lint
         # failed outright); now that it runs, ~95 pre-existing errors surface

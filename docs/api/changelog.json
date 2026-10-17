@@ -1,0 +1,13 @@
+[
+  {
+    "version": "2026-10-17",
+    "date": "2026-10-17",
+    "changes": [
+      {
+        "type": "added",
+        "breaking": false,
+        "note": "First versioned contract. Baseline of the routes listed in lib/api-contract.ts as they behaved at spike 663."
+      }
+    ]
+  }
+]

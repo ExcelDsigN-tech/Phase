@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto"
 import { NextRequest, NextResponse } from "next/server"
+import { API_VERSION_HEADER, FORWARDED_API_VERSION_HEADER, isKnownApiVersion } from "@/lib/api-versioning"
 
 type ApiLogLevel = "info" | "warn" | "error"
 type ApiMetadata = Record<string, unknown>
@@ -27,6 +28,9 @@ function getErrorMessage(error: unknown): string {
 export function createApiRequestContext(request: NextRequest, route: string) {
   const startedAt = Date.now()
   const correlationId = getIncomingCorrelationId(request)
+  // phase-163: only a version the middleware negotiated is logged, so the label set stays closed.
+  const forwardedVersion = request.headers.get(FORWARDED_API_VERSION_HEADER)
+  const apiVersion = isKnownApiVersion(forwardedVersion) ? forwardedVersion : undefined
 
   function log(level: ApiLogLevel, event: string, metadata: ApiMetadata = {}) {
     const payload = {
@@ -36,6 +40,7 @@ export function createApiRequestContext(request: NextRequest, route: string) {
       route,
       method: request.method,
       correlationId,
+      ...(apiVersion ? { apiVersion } : {}),
       ...metadata,
     }
     const line = JSON.stringify(payload)
@@ -51,6 +56,7 @@ export function createApiRequestContext(request: NextRequest, route: string) {
     const response = NextResponse.json(body, { ...responseInit, status, headers })
     response.headers.set(CORRELATION_HEADER, correlationId)
     response.headers.set(REQUEST_ID_HEADER, correlationId)
+    if (apiVersion) response.headers.set(API_VERSION_HEADER, apiVersion)
     log(status >= 500 ? "error" : status >= 400 ? "warn" : "info", event, {
       status,
       durationMs: Date.now() - startedAt,
@@ -65,7 +71,7 @@ export function createApiRequestContext(request: NextRequest, route: string) {
     return json({ error: "Internal server error" }, { status, event })
   }
 
-  return { correlationId, log, json, errorJson }
+  return { correlationId, apiVersion, log, json, errorJson }
 }
 
 // ── Spikes 672-675: closed event names for new flows (no PII in events) ──

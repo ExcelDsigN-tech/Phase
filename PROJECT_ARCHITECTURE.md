@@ -100,6 +100,7 @@ Owns:
 - **Deterministic status codes** (validation, cooldown, authorization, pending).
 - **No implicit success**: all state transitions explicit and auditable.
 - **Compatibility routes** allowed if typed and documented.
+- **Versioned contract** (`phase-163`): `lib/api-contract.ts` is the source of truth for the public surface; `docs/api/openapi.json` and `docs/api/changelog.json` are rendered from it. Middleware negotiates `X-API-Version` / `Accept-Version` on `/api/*`, echoes `X-API-Version`, answers unknown versions with `406 UNSUPPORTED_API_VERSION` and sunset ones with `410 API_VERSION_SUNSET`, and adds `Deprecation` / `Sunset` / `Link` from `ROUTE_DEPRECATIONS`. CI blocks a breaking diff against the target branch unless a new version and a `breaking: true` changelog entry ship with it.
 - **Optimistic concurrency on shared mutable records**: a record that more than one
   client can edit carries an integer `version`. Reads publish it as an `ETag`;
   mutations may echo it back as `If-Match` (or `parent_version` for appends) and
@@ -199,6 +200,7 @@ is a fixed-size digest of the canonical payload, keeping it under wallet
 | `phase-144` | `NEXT_PUBLIC_FEATURE_PHASE_144` / `FEATURE_PHASE_144` | ve-PHASELQ time-locked governance escrow with pro-rata treasury fee-share distribution | off | Unset var, restart — governance ve-lock route returns 404, SQLite ve rows remain inert |
 | `phase-145` | `NEXT_PUBLIC_FEATURE_PHASE_145` / `FEATURE_PHASE_145` | Gauge voting for quest emissions with ve-weight directing collection quest budgets | off | Unset var, restart — gauge route returns 404, SQLite vote rows remain inert |
 | `phase-154` | `NEXT_PUBLIC_FEATURE_PHASE_154` / `FEATURE_PHASE_154` | Outbound webhook subscriptions: admin-managed subscriber endpoints with per-endpoint HMAC secrets and signed, retried event delivery (`settle.verified`, `market.offer_accepted`, `faucet.claim_completed`). Partial slice of spike 664 (issue #527) — no production event wiring, SSRF fencing, or redelivery UI yet | off | Unset var, restart — admin routes return 404; `webhook-subscriptions.json` rows remain inert, no migration to undo |
+| `phase-163` | `NEXT_PUBLIC_FEATURE_PHASE_163` / `FEATURE_PHASE_163` | API versioning (spike 663 / #526): middleware negotiation for `/api/*`, `X-API-Version` echo, typed `406`/`410`, RFC 9745/8594 deprecation headers, `GET /api/versions` (summary or `?format=openapi`). The CI contract gate (`npm run api:contract`) runs regardless of the flag | off | Unset var, restart — no negotiation or version headers, `/api/versions` returns 404; nothing persisted |
 
 Flags are read via `lib/feature-flags.ts:isFeatureEnabled`. Client flags use `NEXT_PUBLIC_*`, server also accepts `FEATURE_*`. Zero regression when off.
 

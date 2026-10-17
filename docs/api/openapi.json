@@ -1,0 +1,2296 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PHASE API",
+    "version": "2026-10-17",
+    "x-api-versions": [
+      {
+        "id": "2026-10-17",
+        "released": "2026-10-17",
+        "status": "current"
+      }
+    ]
+  },
+  "paths": {
+    "/api/faucet": {
+      "get": {
+        "operationId": "faucet.status",
+        "summary": "Faucet eligibility and last claim for a wallet",
+        "tags": [
+          "faucet"
+        ],
+        "parameters": [
+          {
+            "name": "walletAddress",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "412": {
+            "description": "HTTP 412",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "502": {
+            "description": "HTTP 502",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none"
+      },
+      "post": {
+        "operationId": "faucet.claim",
+        "summary": "Claim the testnet PHASELQ faucet reward",
+        "tags": [
+          "faucet"
+        ],
+        "parameters": [
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "HTTP 202",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "HTTP 404",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "409": {
+            "description": "HTTP 409",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "HTTP 412",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "HTTP 500",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "HTTP 502",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "HTTP 503",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-state-changing": true,
+        "x-signing": "none",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "walletAddress": {},
+                  "userAddress": {},
+                  "reward": {},
+                  "referralCode": {},
+                  "turnstileToken": {},
+                  "hashcashProof": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/claim-bounty": {
+      "post": {
+        "operationId": "bounty.claim",
+        "summary": "Bounty claim; proxies the faucet claim and mirrors its status",
+        "tags": [
+          "faucet"
+        ],
+        "parameters": [
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "202": {
+            "description": "HTTP 202",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "404": {
+            "description": "HTTP 404",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "409": {
+            "description": "HTTP 409",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "412": {
+            "description": "HTTP 412",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "500": {
+            "description": "HTTP 500",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "502": {
+            "description": "HTTP 502",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "503": {
+            "description": "HTTP 503",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          }
+        },
+        "x-state-changing": true,
+        "x-signing": "none",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "walletAddress": {},
+                  "userAddress": {},
+                  "reward": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/soroban-rpc": {
+      "get": {
+        "operationId": "rpc.health",
+        "summary": "Method guard; GET is not supported",
+        "tags": [
+          "rpc"
+        ],
+        "parameters": [
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "405": {
+            "description": "HTTP 405",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none"
+      },
+      "post": {
+        "operationId": "rpc.call",
+        "summary": "Soroban JSON-RPC proxy with failover. JSON-RPC errors arrive as HTTP 200 with an `error` member",
+        "tags": [
+          "rpc"
+        ],
+        "parameters": [
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "413": {
+            "description": "HTTP 413",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "HTTP 503",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "jsonrpc": {},
+                  "id": {},
+                  "method": {},
+                  "params": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/classic-liq": {
+      "get": {
+        "operationId": "liq.status",
+        "summary": "Classic LIQ claim status for a wallet",
+        "tags": [
+          "settlement"
+        ],
+        "parameters": [
+          {
+            "name": "walletAddress",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "502": {
+            "description": "HTTP 502",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "503": {
+            "description": "HTTP 503",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none"
+      },
+      "post": {
+        "operationId": "liq.claim",
+        "summary": "Send the classic LIQ reward to a wallet with an existing trustline",
+        "tags": [
+          "settlement"
+        ],
+        "parameters": [
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "409": {
+            "description": "HTTP 409",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "412": {
+            "description": "HTTP 412",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "502": {
+            "description": "HTTP 502",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "503": {
+            "description": "HTTP 503",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          }
+        },
+        "x-state-changing": true,
+        "x-signing": "none",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "walletAddress": {},
+                  "userAddress": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/classic-liq/trustline": {
+      "get": {
+        "operationId": "liq.trustline.status",
+        "summary": "Trustline submission status",
+        "tags": [
+          "settlement"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "view",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "404": {
+            "description": "HTTP 404",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "500": {
+            "description": "HTTP 500",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none"
+      },
+      "post": {
+        "operationId": "liq.trustline.submit",
+        "summary": "Submit a client-signed changeTrust XDR (single or batch)",
+        "tags": [
+          "settlement"
+        ],
+        "parameters": [
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "409": {
+            "description": "HTTP 409",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "422": {
+            "description": "HTTP 422",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "502": {
+            "description": "HTTP 502",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          }
+        },
+        "x-state-changing": true,
+        "x-signing": "wallet",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "signedXdr": {},
+                  "signedXdrs": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nft-listings": {
+      "get": {
+        "operationId": "listings.list",
+        "summary": "Paginated NFT listings",
+        "tags": [
+          "market"
+        ],
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none"
+      },
+      "post": {
+        "operationId": "listings.write",
+        "summary": "Create or cancel a listing",
+        "tags": [
+          "market"
+        ],
+        "parameters": [
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "202": {
+            "description": "HTTP 202",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "413": {
+            "description": "HTTP 413",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          }
+        },
+        "x-state-changing": true,
+        "x-signing": "wallet",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tokenId": {},
+                  "collectionId": {},
+                  "priceStroops": {},
+                  "seller": {},
+                  "cancelId": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/market": {
+      "get": {
+        "operationId": "market.list",
+        "summary": "Market listings with filters",
+        "tags": [
+          "market"
+        ],
+        "parameters": [
+          {
+            "name": "collection",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "drop",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "exclude_ap",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "seller",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none"
+      },
+      "post": {
+        "operationId": "market.create",
+        "summary": "Create a market listing",
+        "tags": [
+          "market"
+        ],
+        "parameters": [
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "HTTP 201",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          }
+        },
+        "x-state-changing": true,
+        "x-signing": "wallet",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token_id": {},
+                  "collection_id": {},
+                  "seller_wallet": {},
+                  "name": {},
+                  "image": {},
+                  "price_phaselq": {},
+                  "accepts_offers": {},
+                  "min_offer": {},
+                  "creator_wallet": {},
+                  "royalty_bps": {},
+                  "suggestion_id": {},
+                  "lang": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/signals": {
+      "get": {
+        "operationId": "signals.list",
+        "summary": "Signal feed",
+        "tags": [
+          "signals"
+        ],
+        "parameters": [
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none"
+      },
+      "post": {
+        "operationId": "signals.create",
+        "summary": "Publish a SEP-53 signed signal",
+        "tags": [
+          "signals"
+        ],
+        "parameters": [
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "404": {
+            "description": "HTTP 404",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          }
+        },
+        "x-state-changing": true,
+        "x-signing": "wallet",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wallet": {},
+                  "title": {},
+                  "body": {},
+                  "type": {},
+                  "channel": {},
+                  "signature": {},
+                  "timestamp": {},
+                  "nft_token_id": {},
+                  "nft_collection_id": {},
+                  "nft_name": {},
+                  "nft_image": {},
+                  "poll_options": {},
+                  "poll_closes_at": {},
+                  "scheduled_for": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/x402": {
+      "get": {
+        "operationId": "x402.resource",
+        "summary": "x402 local shim resource. 503 unless X402_LOCAL_SHIM_ENABLED=true; 402 without payment",
+        "tags": [
+          "settlement"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "401": {
+            "description": "HTTP 401",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "402": {
+            "description": "HTTP 402",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "503": {
+            "description": "HTTP 503",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none"
+      },
+      "post": {
+        "operationId": "x402.facilitate",
+        "summary": "x402 local shim facilitator. 503 unless X402_LOCAL_SHIM_ENABLED=true",
+        "tags": [
+          "settlement"
+        ],
+        "parameters": [
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "401": {
+            "description": "HTTP 401",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "503": {
+            "description": "HTTP 503",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "payment_token": {},
+                  "user_address": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/x402/verify": {
+      "post": {
+        "operationId": "x402.verify",
+        "summary": "Verify an x402 payment token",
+        "tags": [
+          "settlement"
+        ],
+        "parameters": [
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "409": {
+            "description": "HTTP 409",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "503": {
+            "description": "HTTP 503",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "payment_token": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/x402/supported": {
+      "get": {
+        "operationId": "x402.supported",
+        "summary": "Supported x402 schemes and networks",
+        "tags": [
+          "settlement"
+        ],
+        "parameters": [
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none"
+      }
+    },
+    "/api/ipfs": {
+      "get": {
+        "operationId": "ipfs.status",
+        "summary": "IPFS pinning configuration status",
+        "tags": [
+          "ipfs"
+        ],
+        "parameters": [
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none"
+      },
+      "post": {
+        "operationId": "ipfs.pin",
+        "summary": "Pin an uploaded file to IPFS",
+        "tags": [
+          "ipfs"
+        ],
+        "parameters": [
+          {
+            "name": "retries",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "baseDelayMs",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "502": {
+            "description": "HTTP 502",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "503": {
+            "description": "HTTP 503",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          }
+        },
+        "x-state-changing": true,
+        "x-signing": "none",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/metadata/{id}": {
+      "get": {
+        "operationId": "metadata.get",
+        "summary": "SEP-50 token metadata JSON",
+        "tags": [
+          "metadata"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "c",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "m",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "404": {
+            "description": "HTTP 404",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "502": {
+            "description": "HTTP 502",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none"
+      },
+      "options": {
+        "operationId": "metadata.options",
+        "summary": "CORS preflight",
+        "tags": [
+          "metadata"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "HTTP 204",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none"
+      }
+    },
+    "/api/versions": {
+      "get": {
+        "operationId": "versions.get",
+        "summary": "Supported versions, deprecations, changelog, or the OpenAPI document (?format=openapi). 404 unless phase-163 is on",
+        "tags": [
+          "meta"
+        ],
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "404": {
+            "description": "HTTP 404",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none"
+      }
+    },
+    "/api/wallet/phase-nfts": {
+      "get": {
+        "operationId": "wallet.nfts",
+        "summary": "PHASE NFTs owned by a wallet",
+        "tags": [
+          "wallet"
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-API-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "Accept-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "400": {
+            "description": "HTTP 400",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported API version (phase-163)"
+          },
+          "500": {
+            "description": "HTTP 500",
+            "headers": {
+              "X-API-Version": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Negotiated version (phase-163)"
+              }
+            }
+          }
+        },
+        "x-state-changing": false,
+        "x-signing": "none"
+      }
+    }
+  }
+}
