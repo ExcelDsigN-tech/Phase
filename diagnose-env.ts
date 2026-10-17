@@ -13,7 +13,10 @@ import {
   isPhase95Enabled,
   auditQuestExperimentWiring,
   isQuestExperimentEnabled,
+  diagnoseCreatorEnv,
 } from "@/lib/env-validation"
+import { isFeatureEnabled } from "@/lib/feature-flags"
+import fs from "node:fs"
 import {
   classicLiqIssuerForStellarToml,
   expectedClassicPhaserLiqSorobanContractId,
@@ -199,7 +202,6 @@ console.log("=".repeat(70))
 console.log("\n🔒 Content Security Policy (CSP) Compliance:")
 try {
   const nextConfigPath = "./next.config.mjs"
-  const fs = require("fs")
   if (fs.existsSync(nextConfigPath)) {
     const configContent = fs.readFileSync(nextConfigPath, "utf8")
     const hasCsp = configContent.includes("Content-Security-Policy")
@@ -229,4 +231,12 @@ try {
   }
 } catch (e) {
   console.error("   ❌ ERROR checking CSP configuration:", e instanceof Error ? e.message : String(e))
+}
+
+// phase-161: same creator checks as `npm run creator -- env`, presence and format only.
+if (isFeatureEnabled("phase-161")) {
+  console.log("\n🧰 Creator CLI (phase-161):")
+  for (const c of diagnoseCreatorEnv(process.env, ["pin", "deploy"]).checks) {
+    console.log(`   ${c.ok ? "✅" : "❌"} ${c.variable}: ${c.detail}`)
+  }
 }

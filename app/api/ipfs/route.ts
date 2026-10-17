@@ -5,6 +5,7 @@ import {
   isPhase120Enabled,
   parseAndValidateChecksumHeader,
   pinFileToIpfsWithRetry,
+  resolvePinataJwt,
   resolveRetryConfig,
 } from "@/lib/ipfs-upload-retry"
 
@@ -13,17 +14,9 @@ const PinataRetryQuerySchema = z.object({
   baseDelayMs: z.coerce.number().int().min(100).max(10_000).optional(),
 })
 
-function pinataJwt(): string | undefined {
-  const a = process.env.PINATA_JWT?.trim()
-  if (a) return a
-  const b = process.env.PINATA_API_JWT?.trim()
-  if (b) return b
-  return undefined
-}
-
 /** Returns whether server-side file upload is available (no secrets exposed). */
 export async function GET() {
-  const configured = Boolean(pinataJwt())
+  const configured = Boolean(resolvePinataJwt())
   return NextResponse.json({ configured })
 }
 
@@ -32,7 +25,7 @@ export async function GET() {
  *  Fallback (flag off): legacy single-shot path (no retry).
  */
 export async function POST(req: NextRequest) {
-  const jwt = pinataJwt()
+  const jwt = resolvePinataJwt()
   if (!jwt) {
     return NextResponse.json({ error: "La subida de imágenes no está configurada en el servidor." }, { status: 503 })
   }

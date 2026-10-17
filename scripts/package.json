@@ -23,7 +23,8 @@
     "distributor-trust-and-pay": "tsx distributor-trust-and-payment.ts",
     "reset:phase": "tsx reset-phase.ts",
     "deploy:phase-sep50": "tsx deploy-phase-sep50.ts",
-    "seed:phaser-prueba": "tsx seed-phaser-prueba.ts"
+    "seed:phaser-prueba": "tsx seed-phaser-prueba.ts",
+    "creator": "cd .. && npm run -s creator --"
   },
   "dependencies": {
     "@stellar/freighter-api": "^6.0.1",

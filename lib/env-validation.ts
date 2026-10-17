@@ -3,7 +3,7 @@
  * en la configuración de contratos y cuentas Stellar.
  */
 
-import { StrKey } from "@stellar/stellar-sdk"
+import { Keypair, StrKey } from "@stellar/stellar-sdk"
 import { z } from "zod"
 
 export type EnvValidationError = {
@@ -119,7 +119,6 @@ function validateSecretKey(
 
   try {
     // Intentar parsear como keypair
-    const { Keypair } = require("@stellar/stellar-sdk")
     Keypair.fromSecret(trimmed)
   } catch {
     return {
@@ -290,7 +289,6 @@ export function validateFaucetIssuerConfig(
   }
 
   try {
-    const { Keypair } = require("@stellar/stellar-sdk")
     const kp = Keypair.fromSecret(adminSecret.trim())
     const signerPublic = kp.publicKey()
 
@@ -700,4 +698,81 @@ export async function auditPhaseFeatureWiring(): Promise<{ ok: boolean; notes: s
   }
 
   return { ok: allOk, notes }
+}
+
+// ── Spike 661 (phase-161): reusable creator env diagnostics ────────────────────
+// Shared by the creator CLI and diagnose-env.ts. Reports presence and format
+// only: no value, prefix or length of a secret ever leaves this function.
+
+export type CreatorCapability = "pin" | "deploy"
+
+export type EnvCheck = {
+  id: string
+  variable: string
+  ok: boolean
+  required: boolean
+  detail: "present" | "missing" | "invalid_format" | "not_testnet" | "secret_in_public_var"
+}
+
+export const TESTNET_NETWORK_PASSPHRASE = "Test SDF Network ; September 2015"
+
+function present(env: Record<string, string | undefined>, key: string): string | undefined {
+  const v = env[key]?.trim()
+  return v ? v : undefined
+}
+
+export function diagnoseCreatorEnv(
+  env: Record<string, string | undefined>,
+  needs: readonly CreatorCapability[],
+): { ok: boolean; checks: EnvCheck[] } {
+  const checks: EnvCheck[] = []
+  const wantPin = needs.includes("pin")
+  const wantDeploy = needs.includes("deploy")
+
+  const jwt = present(env, "PINATA_JWT") ?? present(env, "PINATA_API_JWT")
+  checks.push({ id: "pin.jwt", variable: "PINATA_JWT", ok: Boolean(jwt) || !wantPin, required: wantPin, detail: jwt ? "present" : "missing" })
+
+  const admin = present(env, "ADMIN_SECRET_KEY")
+  checks.push({
+    id: "deploy.admin_secret",
+    variable: "ADMIN_SECRET_KEY",
+    ok: admin ? StrKey.isValidEd25519SecretSeed(admin) : !wantDeploy,
+    required: wantDeploy,
+    detail: !admin ? "missing" : StrKey.isValidEd25519SecretSeed(admin) ? "present" : "invalid_format",
+  })
+
+  const token = present(env, "NEXT_PUBLIC_PHASER_TOKEN_ID")
+  checks.push({
+    id: "deploy.token_contract",
+    variable: "NEXT_PUBLIC_PHASER_TOKEN_ID",
+    ok: token ? isValidContractId(token) : !wantDeploy,
+    required: wantDeploy,
+    detail: !token ? "missing" : isValidContractId(token) ? "present" : "invalid_format",
+  })
+
+  const treasury = present(env, "NEXT_PUBLIC_CLASSIC_LIQ_ISSUER")
+  checks.push({
+    id: "deploy.treasury",
+    variable: "NEXT_PUBLIC_CLASSIC_LIQ_ISSUER",
+    ok: treasury ? isValidAccountId(treasury) : !wantDeploy,
+    required: wantDeploy,
+    detail: !treasury ? "missing" : isValidAccountId(treasury) ? "present" : "invalid_format",
+  })
+
+  const passphrase = present(env, "STELLAR_NETWORK_PASSPHRASE")
+  checks.push({
+    id: "network.passphrase",
+    variable: "STELLAR_NETWORK_PASSPHRASE",
+    ok: !passphrase || passphrase === TESTNET_NETWORK_PASSPHRASE,
+    required: false,
+    detail: !passphrase ? "missing" : passphrase === TESTNET_NETWORK_PASSPHRASE ? "present" : "not_testnet",
+  })
+
+  for (const [key, value] of Object.entries(env)) {
+    if (key.startsWith("NEXT_PUBLIC_") && value && StrKey.isValidEd25519SecretSeed(value.trim())) {
+      checks.push({ id: "security.public_secret", variable: key, ok: false, required: true, detail: "secret_in_public_var" })
+    }
+  }
+
+  return { ok: checks.every((c) => c.ok), checks }
 }

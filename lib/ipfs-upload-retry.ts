@@ -481,6 +481,20 @@ export async function uploadToIpfsWithRetry(
 
 // ─── validation helpers for API ──────────────────────────────────────────────
 
+/**
+ * Spike 661: one lookup order for the Pinata JWT, shared by `POST /api/ipfs`
+ * and the headless `phase-creator pin`. The value is never logged or returned.
+ */
+export function resolvePinataJwt(env: Record<string, string | undefined> = process.env): string | undefined {
+  return env.PINATA_JWT?.trim() || env.PINATA_API_JWT?.trim() || undefined
+}
+
+/** Remove a known secret from text before it is printed (CLI output, CI logs). */
+export function scrubSecret(text: string, secret: string | undefined): string {
+  if (!secret || secret.length < 8) return text
+  return text.split(secret).join("[REDACTED]")
+}
+
 export const PinRequestChecksumHeader = "x-checksum-sha256"
 
 export function parseAndValidateChecksumHeader(value: string | null): string | null {

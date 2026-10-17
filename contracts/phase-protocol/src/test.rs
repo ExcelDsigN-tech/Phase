@@ -283,3 +283,70 @@ fn bond_challenge_slash_compensates_and_rejection_forfeits_stake() {
     assert_eq!(f.client.try_release_listing_bond(&r2), Err(Ok(PhaseError::BondNotActive)));
     let _ = &f.admin;
 }
+
+// ── 661 offline metadata validation parity ──────────────────────────────────
+// The same vectors run in lib/__tests__/creator-metadata-rules.test.ts, so the
+// creator CLI can never drift from the on-chain rule.
+
+const JSON_FRAGMENT_VECTORS: &str = include_str!("../test-vectors/json-fragment.tsv");
+
+fn hex_nibble(c: u8) -> u8 {
+    match c {
+        b'0'..=b'9' => c - b'0',
+        b'a'..=b'f' => c - b'a' + 10,
+        _ => panic!("bad hex digit"),
+    }
+}
+
+#[test]
+fn json_fragment_rule_matches_shared_vectors() {
+    let env = Env::default();
+    let mut checked = 0u32;
+    for line in JSON_FRAGMENT_VECTORS.lines() {
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.split('\t');
+        let expect = cols.next().unwrap();
+        let max_len: u32 = cols.next().unwrap().parse().unwrap();
+        let hex = cols.next().unwrap_or("").as_bytes();
+        let mut buf = [0u8; 512];
+        let n = hex.len() / 2;
+        for i in 0..n {
+            buf[i] = (hex_nibble(hex[2 * i]) << 4) | hex_nibble(hex[2 * i + 1]);
+        }
+        let s = String::from_bytes(&env, &buf[..n]);
+        assert_eq!(str_is_safe_for_json_fragment(&s, max_len), expect == "ok", "vector: {}", line);
+        checked += 1;
+    }
+    assert!(checked >= 15);
+}
+
+#[test]
+fn create_collection_counts_utf8_bytes_not_chars() {
+    let f = setup();
+    let creator = Address::generate(&f.env);
+    // 32 two-byte chars = 64 bytes: accepted.
+    let ok = f.client.try_create_collection(
+        &creator,
+        &String::from_str(&f.env, "éééééééééééééééééééééééééééééééé"),
+        &10_000_000i128,
+        &String::from_str(&f.env, "ipfs://x"),
+    );
+    assert!(ok.is_ok());
+    // 33 two-byte chars = 66 bytes: InvalidCollectionMetadata (#10).
+    let too_long = f.client.try_create_collection(
+        &creator,
+        &String::from_str(&f.env, "ééééééééééééééééééééééééééééééééé"),
+        &10_000_000i128,
+        &String::from_str(&f.env, "ipfs://x"),
+    );
+    assert_eq!(too_long, Err(Ok(PhaseError::InvalidCollectionMetadata)));
+    let zero_price = f.client.try_create_collection(
+        &creator,
+        &String::from_str(&f.env, "Free"),
+        &0i128,
+        &String::from_str(&f.env, ""),
+    );
+    assert_eq!(zero_price, Err(Ok(PhaseError::AmountBelowCollectionPrice)));
+}

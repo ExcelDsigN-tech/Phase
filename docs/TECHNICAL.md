@@ -414,6 +414,7 @@ NEXT_PUBLIC_FEATURE_PHASE_146=1
 NEXT_PUBLIC_FEATURE_PHASE_147=1
 NEXT_PUBLIC_FEATURE_PHASE_148=1
 NEXT_PUBLIC_FEATURE_PHASE_149=1
+FEATURE_PHASE_161=1               # creator CLI side effects (server/CLI only)
 # Server-only aliases also accepted: FEATURE_PHASE_104, etc.
 ```
 
@@ -429,6 +430,10 @@ Agent tuning (all optional, server-only):
 | `PHASE_QUEST_ARC_MAX_STROOPS` | `150000000` (15 PHASELQ) | per-arc reward cap |
 
 Rollback: unset the var or set `0` and restart. No ledger migration to revert; off-chain stores remain but are ignored when flag off. See `PROJECT_ARCHITECTURE.md` §10.
+
+| Flag | Scope | Rollback |
+|---|---|---|
+| `phase-161` | Creator CLI (spike 661): `npm run creator -- <scaffold\|validate\|env\|pin\|deploy\|run>`; exit 0 ok, 1 invalid, 2 usage, 3 env, 4 remote, 5 flag off. Rules in `lib/creator-metadata-rules.ts`, parity vectors in `contracts/phase-protocol/test-vectors/json-fragment.tsv` | Unset. Side-effecting commands exit 5, read-only ones keep working |
 
 ---
 
