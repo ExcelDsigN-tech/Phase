@@ -2,48 +2,78 @@
 
 ## What the issue claimed
 
-`/docs` is static. Integrators can't try a route without writing code, there is no typed request builder or response viewer, correlation IDs are invisible, and a naive console would mishandle the API's awkward cases: JSON-RPC errors wrapped in HTTP 200, the x402 shim's conditional 503, and 429 with Retry-After. It would also have to keep signing on the client and stop state-changing calls from leaving testnet.
+`/docs` only shows static link cards. Routes have inconsistent, undocumented contracts (such as JSON-RPC errors wrapped in HTTP 200) and there's no central route manifest. Wallet-gated routes need signatures the page can't produce. The goal: an executable try-it-live console with a params editor, a response inspector, and wallet-gated signing through the wallet kit without exposing keys. It should show per-call correlation IDs, run on testnet only, and sit behind a default-off flag.
 
 ## What the code actually did at spike time
 
-- `app/docs/page.tsx` rendered `lib/project-docs-content.ts` blocks. There was no interactive element.
-- `/api/soroban-rpc` returns upstream JSON-RPC errors with HTTP 200, and uses a 200 JSON-RPC envelope for its own circuit-open case so the Stellar SDK reads the body.
-- `/api/x402` (GET and POST) returns `503 {"error":"x402 local shim disabled"}` unless `X402_LOCAL_SHIM_ENABLED=true`. That's a configuration state, not an outage.
-- `/api/soroban-rpc` and `/api/faucet` send `Retry-After` with 429/503.
-- `lib/viewer-signature.ts:signSignalPayload` already signs SEP-53 signal proofs client-side through the Wallets Kit.
-- Of the listed routes, only `POST /api/signals` verifies a wallet signature. `POST /api/classic-liq/trustline` takes a client-signed XDR. `market` and `nft-listings` writes check no signature.
+- `app/docs/page.tsx` rendered `lib/project-docs-content.ts` blocks. Nothing was interactive.
+- `/api/soroban-rpc` returns upstream JSON-RPC errors as HTTP 200 and uses a 200 JSON-RPC envelope (`-32603`) for its own failover outage, so the Stellar SDK reads the body.
+- `/api/x402` returns `503 {"error":"x402 local shim disabled"}` unless `X402_LOCAL_SHIM_ENABLED=true`. That's configuration, not an outage.
+- `/api/soroban-rpc` answers `429` + `Retry-After: 2` when more than 12 calls are in flight, and `503` + `Retry-After: 10` while its circuit is open. Its per-IP limiter, `checkProxyRateLimit`, is defined but never called.
+- Only `POST /api/signals` verifies a wallet signature (SEP-53). `POST /api/classic-liq/trustline` takes a client-signed XDR. `market` and `nft-listings` writes check no signature.
+- None of the listed routes echo a correlation ID; only routes using `createApiRequestContext` do.
 
-## Delivered (phase-162)
+## Delivered in this PR (phase-162)
 
-1. **Typed request builder** (`lib/api-playground.ts:buildPlaygroundRequest`): driven by the same contract as spike 663 (`lib/api-contract.ts`). Path params are required and URL-encoded. Query params are limited to the declared ones. Bodies must be JSON objects with only declared fields, and JSON-RPC bodies need `jsonrpc: "2.0"` plus a method. URLs are always relative and same-origin, so the console can't be pointed at another host. An optional `X-API-Version` is sent through to the phase-163 negotiation.
-2. **Response viewer** (`interpretPlaygroundResponse`): status plus a classified kind (`ok`, `jsonrpc_error`, `x402_shim_disabled`, `rate_limited`, `unavailable`, `version_rejected`, `http_error`), the JSON-RPC error code and message from inside a 200, Retry-After as seconds or HTTP-date, the negotiated version echo, and secret redaction (`redactHostErrorMessage`) before anything is shown.
-3. **Correlation IDs**: the console sends a fresh `x-correlation-id` per request and shows both the sent value and whatever the server echoed (`x-correlation-id` / `x-request-id`), so you can tell when a route doesn't echo it.
-4. **Error normalization**: contract `#13` renders as `[ ERROR: BIOMETRIC_TRUST_GATE_CLOSED ]`, and other `Error(Contract, #N)` codes go through the existing `humanizePhaseHostErrorMessage` with the localized PhaseError lines.
-5. **Wallet-gated client signing** (`components/docs-api-playground.tsx`): for `signals.create` the console fills `wallet`, `timestamp` and `signature` at send time with `signSignalPayload`, in the browser. The editor text is never rewritten. The server only ever sees the signature.
-6. **Testnet fence** (`fencePlaygroundCall`): state-changing operations only run when the build's passphrase is testnet. Signed operations need a connected wallet, and if the wallet reports a network it must be testnet. Multipart upload, the trustline XDR submit and the CORS preflight are docs-only.
-7. **Input is never lost**: one input record per operation lives in component state and no response, error, rate limit or failed signature clears it. A 429 disables Send with a countdown and says the input is kept.
-8. **Copy**: every string is in `lib/phase-copy.ts` (`playground`, EN and ES). The docs page reads `NEXT_PUBLIC_FEATURE_PHASE_162` literally, as it already does for phase-668, because a dynamic `isFeatureEnabled` lookup is never inlined into client bundles.
+1. **Route manifest and typed request builder**: the console reads the same contract as spike 663 (`lib/api-contract.ts`), and `lib/api-playground.ts:buildPlaygroundRequest` builds from it. Path params are required and encoded, query params are limited to the declared ones, bodies must be JSON objects with only declared fields, and JSON-RPC needs `jsonrpc: "2.0"` plus a method. URLs are relative and same-origin only.
+2. **Response inspector** (`interpretPlaygroundResponse`): status plus a classified kind (`ok`, `jsonrpc_error`, `x402_shim_disabled`, `rate_limited`, `unavailable`, `version_rejected`, `http_error`), the JSON-RPC code and message from inside a 200, `Retry-After` as seconds or HTTP-date, the version echo, and secret redaction before display.
+3. **Correlation IDs**: a fresh `x-correlation-id` per call, shown next to whatever the server echoed (`—` when the route doesn't echo it).
+4. **Wallet-gated client signing**: for `signals.create` the console fills `wallet`, `timestamp` and `signature` at send time with `signSignalPayload` in the browser. The server only ever sees the signature.
+5. **Testnet fence** (`fencePlaygroundCall`): state-changing calls only run on a testnet build. Signed calls need a connected wallet, which must be on testnet if it reports a network. Multipart upload, the trustline XDR submit and the CORS preflight are docs-only.
+6. **Input is never lost**: one input record per operation that no response, error, 429 or failed signature clears. A 429 disables Send with a countdown.
+7. **Errors and i18n**: contract `#13` renders as `[ ERROR: BIOMETRIC_TRUST_GATE_CLOSED ]`, and other PhaseError codes use the existing humanizer. Every console string is in `lib/phase-copy.ts` (`playground`, EN and ES).
 
-## Files ruled out
+## Spike questions (from the issue)
 
-| File | Why it is not changed |
-|------|-----------------------|
-| `app/docs/layout.tsx` | Metadata only. The playground is a section of the page, not a new route. |
-| `app/api/faucet`, `soroban-rpc`, `x402`, `x402/verify`, `x402/supported`, `classic-liq`, `wallet/phase-nfts`, `signals`, `metadata/[id]` route files | The console consumes them exactly as they behave. The awkward cases (200-wrapped JSON-RPC, the conditional 503, Retry-After) are handled on the client by design, because changing them would break the SDK and wallet flows that depend on them. Each one is described in `lib/api-contract.ts`. |
-| `lib/api-observability.ts` | Changed in spike 663 (version echo). Its correlation-ID echo already exists, and the console just displays it. |
-| `lib/stellar-wallet-kit.ts`, `lib/viewer-signature.ts` | Used as-is: `kit.getNetwork()` for the wallet's network and `signSignalPayload` for SEP-53. No new signing code was needed. |
+1. **Minimal testnet loop, and which listed files can break it?** From the console: faucet claim (`POST /api/faucet`), then a JSON-RPC read of the balance (`POST /api/soroban-rpc`), a signed signal (`POST /api/signals`), and a read-back (`GET /api/signals`, `GET /api/wallet/phase-nfts`). Files that can break it on their own: `lib/api-contract.ts` (a wrong field list makes the builder reject a valid body), `lib/stellar-wallet-kit.ts` (signing and network detection), `lib/viewer-signature.ts` (the signed payload has to match server verification byte for byte), and each route handler. On `main`, `lib/stellar-wallet-kit.ts` crashed every page on hydration (`node:crypto` in the client); that's fixed on `chore/fix-main-baseline`, which this branch includes.
+2. **Replay and idempotency per write.** The console adds no write path of its own; every call goes to the existing handler. Signal signatures bind `title`, `body` and a fresh `timestamp`, and the server rejects a stale timestamp. Faucet double submits are handled by `faucetPending` as before. A retry after a timeout sends a **new** correlation ID and a new timestamp, so it's a new request, not a replay.
+3. **Contract-ID drift, issuer rotation, gateway failover.** The fence compares the build's network passphrase and the wallet's against testnet. It doesn't verify contract IDs (the handlers do). Gateway and RPC failover stay in `/api/soroban-rpc`; the console shows the resulting envelope, including the `-32603` outage case.
+4. **409/429/412 taxonomy and recovery without losing input.** 429 → `rate_limited`, with the `Retry-After` countdown and input kept. 503 → `unavailable`, or `x402_shim_disabled` for the shim. 406/410 → `version_rejected`. Any other 4xx/5xx, including 409 and 412 → `http_error`, with the body shown and input kept. `ETag`/`If-Match` routes (signal edits) aren't in this issue's route list, so the console doesn't send `If-Match` yet (follow-up).
+5. **Migration and rollback.** No WASM, schema or sidecar change. Rollback: unset `NEXT_PUBLIC_FEATURE_PHASE_162`, rebuild and redeploy. The section disappears and nothing is persisted.
 
-## Spike questions
+## Acceptance criteria status
 
-The upstream issue text was not reachable from the session that built this, so these follow the summary it was given.
+| Criterion | Status |
+|---|---|
+| End-to-end testnet proof with tx hashes and contract IDs, no hardcoded IDs | Checklist below. The console and proof runner hardcode no IDs. Needs a browser run with a wallet. |
+| Concurrency proof | `npm run proof:662 -- --burst 40` provokes the proxy's 429 and records `Retry-After`. Concurrent writers don't apply to the console itself. |
+| Abuse proof (tampered input, replay; no PII) | Unknown fields and malformed JSON are rejected client-side. Same-origin only. Secrets are redacted before display. No wallet in logs. |
+| Resilience proof | The console correctly classifies the proxy's failover envelope (`-32603` in a 200), shown in the local proof run. |
+| i18n, `#13`, docs, flag row | EN/ES via `pickCopy`, `#13` → `[ ERROR: BIOMETRIC_TRUST_GATE_CLOSED ]`, docs and flag row updated. |
+| No regression with flags off | tsc 0 errors, vitest green, and the section is absent with the flag off. |
 
-1. **Rollback?** Unset `NEXT_PUBLIC_FEATURE_PHASE_162`, rebuild and restart. The section disappears from `/docs`. Nothing is persisted.
-2. **WASM or contract migration?** Does not apply.
-3. **Metrics?** None added. The console reuses the existing correlation-ID logs, so a playground request shows up in server logs under the ID the console displays. No wallet address is logged by the console.
-4. **Tests?** `lib/__tests__/api-playground.test.ts` (15 cases): builder validation and encoding, docs-only marking, starter bodies, the fence (testnet build, wallet required, wallet network mismatch), JSON-RPC-in-200, shim 503 vs outage, Retry-After forms, gate #13 normalization, secret redaction, version echo, EN/ES key parity and section wiring.
-5. **Security?** Relative URLs only, declared fields only, signing in the wallet extension, redaction before display, and state-changing calls fenced to testnet.
+## Verified in this session
 
-## Still needs manual verification
+- `npm run proof:662 -- --base-url http://localhost:3101 --burst 40` against `next dev` with the flag on: console section present, the proxy's JSON-RPC error inside HTTP 200 classified as an error, the x402 shim 503 recognized, a correlation ID sent (none echoed by `/api/x402/supported`), and 28 of 40 concurrent calls got 429 with `Retry-After: 2`. The container can't reach Soroban testnet, so the JSON-RPC error was the proxy's own `-32603` envelope, not an upstream "method not found".
+- Headless Chromium: picked an operation, sent it, saw status, version echo and correlation ID; sent invalid JSON and saw the error while the textarea kept `{ broken`.
 
-- A browser run against a testnet deployment with Freighter: sign and send a signal, check the 429 countdown against `/api/soroban-rpc`, and switch the wallet to mainnet to see the fence trip. No tx hashes or screenshots are claimed here.
-- `kit.getNetwork()` support varies by wallet module. When a module doesn't report a network, the fence relies on the build passphrase alone.
+## Live proof checklist (run by the maintainer)
+
+1. Deploy this branch with `NEXT_PUBLIC_FEATURE_PHASE_162=1` (build-time) and `FEATURE_PHASE_163=1`, pointed at testnet.
+2. `npm run proof:662 -- --base-url https://<preview-host> --burst 40` and confirm every line says PASS.
+3. In a browser with Freighter on **testnet**:
+   - pick `faucet.claim`, send with your wallet address, and note the result;
+   - pick `rpc.call`, send `{"jsonrpc":"2.0","id":1,"method":"getLatestLedger"}`, then a made-up method, and confirm it shows "JSON-RPC error inside an HTTP 200 response";
+   - pick `signals.create`, fill `title`, `body`, `channel`, click **Sign with wallet and send**, and approve in Freighter;
+   - switch Freighter to mainnet and retry `signals.create`: it should be blocked with the wallet-network message and send nothing.
+4. Fill in:
+
+| Item | Value |
+|---|---|
+| Preview URL | `<<PASTE>>` |
+| Faucet claim tx hash | `<<PASTE>>` |
+| PHASELQ token contract ID in use (from env, not code) | `<<PASTE C…>>` |
+| Signal id returned by `signals.create` | `<<PASTE>>` |
+| `signature_verified` on that signal (`GET /api/signals`) | `<<PASTE true/false>>` |
+| Retry-After seen in the burst | `<<PASTE>>` |
+| Mainnet wallet fence message (screenshot) | `<<ATTACH>>` |
+| Proof file | `<<PASTE .data/proofs/662-….json>>` |
+
+## Follow-up / out of scope for this PR
+
+- `If-Match` / version-CAS support for edit routes (`PUT`/`PATCH /api/signals/[id]`), which aren't in this issue's list.
+- Building and signing a `changeTrust` XDR in the console (`liq.trustline.submit` is docs-only for now).
+- File upload for `ipfs.pin`.
+- Localized operation summaries. The console shows `METHOD path · id` only, because the contract summaries are English.
+- Wiring `checkProxyRateLimit` (the per-IP limiter in `/api/soroban-rpc`), which is defined but never called.
+- Correlation-ID echo on the listed routes (they don't use `createApiRequestContext`).

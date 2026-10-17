@@ -184,7 +184,6 @@ export function DocsApiPlayground() {
         ) : null}
       </div>
 
-      <p className="font-sans text-[12px] text-zinc-400">{op.summary}</p>
       <div className="flex flex-wrap gap-2">
         {op.stateChanging ? (
           <>
