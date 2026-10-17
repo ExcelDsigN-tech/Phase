@@ -9,7 +9,7 @@ function run(script: string, args: string[], env: Record<string, string> = {}) {
   const res = spawnSync("npx", ["tsx", path.join("scripts", script), ...args], {
     cwd: ROOT,
     encoding: "utf8",
-    env: { PATH: process.env.PATH ?? "", HOME: process.env.HOME ?? "", ...env },
+    env: { NODE_ENV: "test", PATH: process.env.PATH ?? "", HOME: process.env.HOME ?? "", ...env },
     timeout: 60_000,
   })
   return { code: res.status, out: `${res.stdout}${res.stderr}` }
