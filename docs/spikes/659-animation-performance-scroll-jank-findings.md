@@ -71,6 +71,34 @@ Headless Chromium against `next dev` with `NEXT_PUBLIC_FEATURE_PHASE_159=1`:
 
 On `/explore`, Lenis is off. `npm run proof:659` was run once against the dev server to check the script works. Dev-mode numbers aren't representative, so none are reported here.
 
+## Lab results (production builds, cloud container)
+
+Two `next build && next start` builds of this branch: **A** without the flag, **B** with `NEXT_PUBLIC_FEATURE_PHASE_159=1`. Lighthouse 12.2.1, mobile form factor, simulated throttling, median of 5 runs per route, two full passes. The container's CPU isn't a real phone, and outbound requests to Stellar, CoinGecko and Google were blocked, so read these as relative, not absolute.
+
+| Route | Metric | A (off) pass 1 / 2 | B (on) pass 1 / 2 | Change |
+|---|---|---|---|---|
+| `/` | Main-thread work (ms) | 6009 / 5782 | 4371 / 4261 | **−24% to −27%** |
+| `/` | Speed Index (ms) | 2791 / 2839 | 2417 / 2141 | **−13% to −25%** |
+| `/` | Total Blocking Time (ms) | 1434 / 1347 | 1385 / 1272 | −3% to −6% (within noise) |
+| `/` | LCP (ms) | 5733 / 5729 | 5740 / 5725 | flat |
+| `/` | CLS | 0.001 / 0.001 | 0 / 0 | flat |
+| `/explore` | Main-thread work (ms) | 3352 / 3289 | 3242 / 3208 | −2% to −3% |
+| `/explore` | LCP (ms) | 5446 / 6041 | 6041 / 5430 | noise (both builds flip between the same two values) |
+
+Behavior check on the same builds (headless Chromium):
+
+| Check | A (off), normal | A (off), reduced motion | B (on), normal | B (on), reduced motion |
+|---|---|---|---|---|
+| `<html data-phase-motion>` | absent | absent | `lean` | `lean` |
+| Lenis on `/` | on | **on** | on | off |
+| Lenis on `/explore` | **on** | | off | |
+| Ticker animation | running | **running** | running | none |
+| Ticker `will-change` | `transform` (permanent) | `transform` | `auto` | `auto` |
+| Hero on CSS scroll timeline | no | no | yes | no |
+| Page errors | none | none | none | none |
+
+The flag-off columns are the legacy behavior the issue describes (reduced motion ignored, Lenis on static grids), which confirms flag off is unchanged and flag on fixes it. A real low-end Android trace is still needed (checklist step 4).
+
 ## Live proof checklist (run by the maintainer)
 
 1. Make two production builds of this branch: **A** without `NEXT_PUBLIC_FEATURE_PHASE_159`, **B** with `NEXT_PUBLIC_FEATURE_PHASE_159=1` (Vercel previews or `next build && next start` on two ports).
@@ -84,7 +112,7 @@ On `/explore`, Lenis is off. `npm run proof:659` was run once against the dev se
 |---|---|
 | Build A URL (flag off) | `<<PASTE>>` |
 | Build B URL (flag on) | `<<PASTE>>` |
-| `proof:659 --compare` table | `<<PASTE TABLE>>` |
+| `proof:659 --compare` table | Lab run above. Paste your preview-URL run here if you redo it: `<<PASTE TABLE>>` |
 | Device / CPU throttle used for the trace | `<<PASTE>>` |
 | Long tasks > 50 ms while scrolling `/` (A vs B) | `<<PASTE>>` |
 | Dropped frames while scrolling `/` (A vs B) | `<<PASTE>>` |
