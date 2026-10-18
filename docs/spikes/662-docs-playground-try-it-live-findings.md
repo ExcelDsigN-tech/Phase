@@ -47,6 +47,18 @@
 - `npm run proof:662 -- --base-url http://localhost:3101 --burst 40` against `next dev` with the flag on: console section present, the proxy's JSON-RPC error inside HTTP 200 classified as an error, the x402 shim 503 recognized, a correlation ID sent (none echoed by `/api/x402/supported`), and 28 of 40 concurrent calls got 429 with `Retry-After: 2`. The container can't reach Soroban testnet, so the JSON-RPC error was the proxy's own `-32603` envelope, not an upstream "method not found".
 - Headless Chromium: picked an operation, sent it, saw status, version echo and correlation ID; sent invalid JSON and saw the error while the textarea kept `{ broken`.
 
+## Lab results (production build, cloud container)
+
+`next build` with `NEXT_PUBLIC_FEATURE_PHASE_162=1`, `next start` with `FEATURE_PHASE_163=1`, run on 2026-10-18. `npm run proof:662 -- --burst 40` passed 5/5:
+
+- the console section is rendered on `/docs`;
+- the proxy's JSON-RPC error inside HTTP 200 is classified as `jsonrpc_error` (this container can't reach Soroban testnet, so it was the proxy's own `-32603` failover envelope);
+- the x402 shim's 503 is recognized as `x402_shim_disabled`, not an outage;
+- a correlation ID was sent, and `/api/x402/supported` doesn't echo one (recorded as a follow-up);
+- 28 of 40 concurrent calls got `429` with `Retry-After: 2`.
+
+Signing and faucet steps need testnet and a wallet; see the checklist.
+
 ## Live proof checklist (run by the maintainer)
 
 1. Deploy this branch with `NEXT_PUBLIC_FEATURE_PHASE_162=1` (build-time) and `FEATURE_PHASE_163=1`, pointed at testnet.
