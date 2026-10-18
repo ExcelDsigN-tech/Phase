@@ -78,7 +78,8 @@ async function record() {
   if (label !== "off" && label !== "on") throw new Error("--label must be off or on")
 
   const html = await (await fetch(`${base}/`)).text()
-  const lean = html.includes('data-phase-motion="lean"')
+  // Match the <html> tag only: the ticker's inline <style> contains the selector text in every build.
+  const lean = /<html[^>]*\sdata-phase-motion="lean"/.test(html)
   if (lean !== (label === "on")) {
     throw new Error(`build at ${base} has lean=${lean} but --label ${label}; rebuild with the right NEXT_PUBLIC_FEATURE_PHASE_159`)
   }
