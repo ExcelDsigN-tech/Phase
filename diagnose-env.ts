@@ -233,9 +233,9 @@ try {
   console.error("   ❌ ERROR checking CSP configuration:", e instanceof Error ? e.message : String(e))
 }
 
-// phase-161: same creator checks as `npm run creator -- env`, presence and format only.
-if (isFeatureEnabled("phase-161")) {
-  console.log("\n🧰 Creator CLI (phase-161):")
+// phase-165: same creator checks as `npm run creator -- env`, presence and format only.
+if (isFeatureEnabled("phase-165")) {
+  console.log("\n🧰 Creator CLI (phase-165):")
   for (const c of diagnoseCreatorEnv(process.env, ["pin", "deploy"]).checks) {
     console.log(`   ${c.ok ? "✅" : "❌"} ${c.variable}: ${c.detail}`)
   }

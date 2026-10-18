@@ -1,5 +1,5 @@
 /**
- * Spike 661 (phase-161): offline mirror of the on-chain collection metadata
+ * Spike 661 (phase-165): offline mirror of the on-chain collection metadata
  * rules in `contracts/phase-protocol/src/lib.rs`.
  *
  * `create_collection` rejects with:

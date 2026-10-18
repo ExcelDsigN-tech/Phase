@@ -700,7 +700,7 @@ export async function auditPhaseFeatureWiring(): Promise<{ ok: boolean; notes: s
   return { ok: allOk, notes }
 }
 
-// ── Spike 661 (phase-161): reusable creator env diagnostics ────────────────────
+// ── Spike 661 (phase-165): reusable creator env diagnostics ────────────────────
 // Shared by the creator CLI and diagnose-env.ts. Reports presence and format
 // only: no value, prefix or length of a secret ever leaves this function.
 

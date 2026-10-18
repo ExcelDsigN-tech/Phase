@@ -1,5 +1,5 @@
 /**
- * Spike 661 (phase-161): `phase-creator` command tree.
+ * Spike 661 (phase-165): `phase-creator` command tree.
  *
  *   phase-creator scaffold <dir>       write <dir>/collection.json
  *   phase-creator validate <file>      offline check against the on-chain rules
@@ -9,7 +9,7 @@
  *   phase-creator run <script> [...]   existing scripts behind one entry point
  *
  * Global: --json, --dry-run, --network testnet. Commands with side effects
- * (pin, deploy, run, scaffold without --dry-run) need FEATURE_PHASE_161=1;
+ * (pin, deploy, run, scaffold without --dry-run) need FEATURE_PHASE_165=1;
  * validate and env are read-only and always available.
  *
  * Everything with I/O comes in through `CliDeps`, so the whole tree is tested
@@ -111,7 +111,7 @@ export function parseCliArgs(argv: readonly string[]): ParsedArgs | { error: str
 }
 
 function flagEnabled(env: CliDeps["env"]): boolean {
-  return featureFlagEnvKeys("phase-161").some((k) => ["1", "true", "yes", "on"].includes((env[k] ?? "").trim().toLowerCase()))
+  return featureFlagEnvKeys("phase-165").some((k) => ["1", "true", "yes", "on"].includes((env[k] ?? "").trim().toLowerCase()))
 }
 
 const HELP = `phase-creator <command> [--json] [--dry-run] [--network testnet]
@@ -125,7 +125,7 @@ const HELP = `phase-creator <command> [--json] [--dry-run] [--network testnet]
   run <script> [-- args]
                         run an existing script: ${Object.keys(RUNNABLE_SCRIPTS).join(", ")}
 
-Exit codes: 0 ok, 1 invalid input, 2 usage, 3 env missing, 4 remote failure, 5 phase-161 disabled.`
+Exit codes: 0 ok, 1 invalid input, 2 usage, 3 env missing, 4 remote failure, 5 phase-165 disabled.`
 
 export async function runCreatorCli(argv: readonly string[], deps: CliDeps): Promise<number> {
   const parsed = parseCliArgs(argv)
@@ -153,7 +153,7 @@ export async function runCreatorCli(argv: readonly string[], deps: CliDeps): Pro
   const { command, positionals, dryRun } = parsed
   const sideEffects = command === "pin" || command === "deploy" || command === "run" || (command === "scaffold" && !dryRun)
   if (sideEffects && !dryRun && !flagEnabled(deps.env)) {
-    return fail(EXIT.disabled, "phase_161_disabled", {}, "phase-161 is off. Set FEATURE_PHASE_161=1 (or use --dry-run).")
+    return fail(EXIT.disabled, "phase_161_disabled", {}, "phase-165 is off. Set FEATURE_PHASE_165=1 (or use --dry-run).")
   }
 
   switch (command) {

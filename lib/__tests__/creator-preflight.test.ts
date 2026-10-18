@@ -15,7 +15,7 @@ function run(script: string, args: string[], env: Record<string, string> = {}) {
   return { code: res.status, out: `${res.stdout}${res.stderr}` }
 }
 
-describe("phase-161 thin-wrapper preflight", () => {
+describe("phase-165 thin-wrapper preflight", () => {
   it("--dry-run prints the plan and exits 0 before any side effect", () => {
     const r = run("check-secret-rotation.ts", ["--dry-run"])
     expect(r.code).toBe(0)
@@ -24,7 +24,7 @@ describe("phase-161 thin-wrapper preflight", () => {
 
   it("with the flag on, a missing env stops the script with exit 3 and names only variables", () => {
     const secretish = "SDUMMYVALUETHATMUSTNOTAPPEARINOUTPUT"
-    const r = run("deploy-phase-sep50.ts", ["--dry-run"], { FEATURE_PHASE_161: "1", PINATA_JWT: secretish })
+    const r = run("deploy-phase-sep50.ts", ["--dry-run"], { FEATURE_PHASE_165: "1", PINATA_JWT: secretish })
     expect(r.code).toBe(3)
     expect(r.out).toContain("ADMIN_SECRET_KEY: missing")
     expect(r.out).not.toContain(secretish)

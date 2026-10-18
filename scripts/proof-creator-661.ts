@@ -1,12 +1,12 @@
 /**
- * Spike 661 (phase-161) live proof runner for the creator CLI.
+ * Spike 661 (phase-165) live proof runner for the creator CLI.
  *
  *   npm run proof:661 -- --asset ./my-image.png [--collection ./collection.json] [--live]
  *
  * Without --live it only runs read-only and dry-run commands. With --live it
  * also pins the asset to Pinata and deploys phase-protocol to testnet, using
  * the env in .env.local (PINATA_JWT, ADMIN_SECRET_KEY, NEXT_PUBLIC_PHASER_TOKEN_ID,
- * NEXT_PUBLIC_CLASSIC_LIQ_ISSUER). FEATURE_PHASE_161=1 must be set for --live.
+ * NEXT_PUBLIC_CLASSIC_LIQ_ISSUER). FEATURE_PHASE_165=1 must be set for --live.
  *
  * Every step's --json output is written to .data/proofs/661-<timestamp>.json.
  * The CLI never prints secret values, so that file is safe to attach to a PR.

@@ -45,7 +45,7 @@
  *   third-party endpoints (partial slice of spike 664 / issue #527)
  * - phase-159: route-scoped smooth scroll, compositor-only motion, reduced-motion
  *   aware flap/ticker (spike 659 / issue #522)
- * - phase-161: creator CLI JSON output and offline metadata validation parity
+ * - phase-165: creator CLI JSON output and offline metadata validation parity
  *   (spike 661 / issue #524)
  * - phase-162: interactive docs playground / try-it-live API console
  *   (spike 662 / issue #525)
@@ -124,7 +124,7 @@ export type PhaseFeatureFlag =
   | "phase-editions"
   | "phase-timed-drops"
   | "phase-159"
-  | "phase-161"
+  | "phase-165"
   | "phase-162"
   | "phase-163";
 
@@ -199,7 +199,7 @@ const FLAG_ENV_MAP: Record<PhaseFeatureFlag, string[]> = {
   "phase-editions": ["NEXT_PUBLIC_FEATURE_PHASE_EDITIONS", "FEATURE_PHASE_EDITIONS"],
   "phase-timed-drops": ["NEXT_PUBLIC_FEATURE_PHASE_TIMED_DROPS", "FEATURE_PHASE_TIMED_DROPS"],
   "phase-159": ["NEXT_PUBLIC_FEATURE_PHASE_159", "FEATURE_PHASE_159"],
-  "phase-161": ["NEXT_PUBLIC_FEATURE_PHASE_161", "FEATURE_PHASE_161"],
+  "phase-165": ["NEXT_PUBLIC_FEATURE_PHASE_165", "FEATURE_PHASE_165"],
   "phase-162": ["NEXT_PUBLIC_FEATURE_PHASE_162", "FEATURE_PHASE_162"],
   "phase-163": ["NEXT_PUBLIC_FEATURE_PHASE_163", "FEATURE_PHASE_163"],
 };
@@ -307,7 +307,7 @@ export function getEnabledFeatureFlags(): PhaseFeatureFlag[] {
     "phase-editions",
     "phase-timed-drops",
     "phase-159",
-    "phase-161",
+    "phase-165",
     "phase-162",
     "phase-163",
   ];

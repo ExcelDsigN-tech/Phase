@@ -1,6 +1,6 @@
 #!/usr/bin/env -S npx tsx
 /**
- * Spike 661 (phase-161): `phase-creator` entry point. All logic lives in
+ * Spike 661 (phase-165): `phase-creator` entry point. All logic lives in
  * lib/creator-cli.ts; this file only wires real fs, env and child processes.
  * `.cts` because scripts/package.json is "type": "module", which breaks named
  * imports from lib/ under tsx (see scripts/diagnose-env.ts).
