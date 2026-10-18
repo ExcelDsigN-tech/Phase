@@ -79,6 +79,7 @@ Signing and faucet steps need testnet and a wallet; see the checklist.
 | `signature_verified` on that signal (`GET /api/signals`) | `true` on both signals (Freighter on testnet, local run of this branch, 2026-10-18; `signals.create` returned 201) |
 | Retry-After seen in the burst | `2` (28 of 40 concurrent calls got 429, prod build) |
 | `rpc.call` `getLatestLedger` (testnet, via /api/soroban-rpc) | 200, `sequence` 5255947, `protocolVersion` 29 (2026-10-18) |
+| `rpc.call` unknown method (`fooBar`) | "200 · JSON-RPC error inside an HTTP 200 response" (2026-10-18) |
 | Mainnet wallet fence message (screenshot) | "Blocked: your wallet is not on testnet. Switch it to Test SDF Network." (Freighter on Mainnet, 2026-10-18). Screenshot `<<ATTACH>>` |
 | Proof file | `<<PASTE .data/proofs/662-….json>>` |
 
