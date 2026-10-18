@@ -5,7 +5,7 @@ Branch `chore/fix-main-baseline`, cut from `main` at `74308a0`.
 | Check | Before | After |
 |---|---|---|
 | `tsc --noEmit` | 120 errors | 0 |
-| `vitest run` | 32 failed / 351 passed, 1 file not loading | 386 passed (52 files) |
+| `vitest run` | 32 failed / 351 passed, 1 file not loading | 414 passed (56 files, after merging upstream #573) |
 | `next build` | failed, 12 errors | passes (3 file-tracing warnings, below) |
 | `npm run lint` | could not start (no `eslint-config-next`) | runs: 286 errors, 106 warnings, all pre-existing |
 | `cargo test` mock-token | failed to build | 1 passed |
