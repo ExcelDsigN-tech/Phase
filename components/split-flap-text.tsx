@@ -179,7 +179,7 @@ export function SplitFlapText(props: SplitFlapTextProps) {
 }
 
 /**
- * phase-159: the H1 renders its final glyphs on the server (nothing to wait for
+ * phase-164: the H1 renders its final glyphs on the server (nothing to wait for
  * at LCP), then scrambles by writing `textContent` directly, so no React render
  * runs per frame. The settle flip is one WAAPI transform with `will-change` set
  * only while it plays. Reduced motion skips the scramble, the flip and the audio.
@@ -319,7 +319,7 @@ function SplitFlapChar({ char, index, animationKey, skipEntrance, speed, playCli
     // Space tiles render a fixed spacer and never read currentChar / isSettled.
     if (isSpace) return
 
-    // Legacy path, kept frame-identical while phase-159 is off. The lean path
+    // Legacy path, kept frame-identical while phase-164 is off. The lean path
     // (LeanSplitFlapText) has no per-frame React state at all.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsSettled(false)

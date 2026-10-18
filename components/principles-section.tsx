@@ -24,7 +24,7 @@ export function PrinciplesSection() {
     if (!sectionRef.current || !headerRef.current || !principlesRef.current) return
 
     const ctx = gsap.context(() => {
-      // phase-159: batched compositor-only reveals; reduced motion stays static.
+      // phase-164: batched compositor-only reveals; reduced motion stays static.
       if (isLeanMotion()) {
         if (prefersReducedMotion()) return
         const items = Array.from(principlesRef.current?.querySelectorAll("article") ?? [])

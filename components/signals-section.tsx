@@ -30,7 +30,7 @@ export function SignalsSection() {
     const lean = isLeanMotion()
     if (lean && prefersReducedMotion()) return
 
-    // phase-159: reuse two quickTo setters instead of allocating a tween per mousemove.
+    // phase-164: reuse two quickTo setters instead of allocating a tween per mousemove.
     const moveX = lean ? gsap.quickTo(cursor, "x", { duration: 0.5, ease: "power3.out" }) : null
     const moveY = lean ? gsap.quickTo(cursor, "y", { duration: 0.5, ease: "power3.out" }) : null
 
@@ -72,7 +72,7 @@ export function SignalsSection() {
     if (!sectionRef.current || !headerRef.current || !cardsRef.current) return
 
     const ctx = gsap.context(() => {
-      // phase-159: batched compositor-only reveals; reduced motion stays static.
+      // phase-164: batched compositor-only reveals; reduced motion stays static.
       if (isLeanMotion()) {
         if (prefersReducedMotion()) return
         batchReveal([headerRef.current!], { x: -60 })

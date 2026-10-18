@@ -230,7 +230,7 @@ const TICKER_CSS = `
   .phase-ticker-track:hover {
     animation-play-state: paused;
   }
-  /* phase-159: the marquee is already a transform animation, so the permanent
+  /* phase-164: the marquee is already a transform animation, so the permanent
      layer hint only costs memory; reduced motion freezes it. */
   html[data-phase-motion="lean"] .phase-ticker-track {
     will-change: auto;

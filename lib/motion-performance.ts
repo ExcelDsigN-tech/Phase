@@ -1,5 +1,5 @@
 /**
- * Spike 659 (phase-159): animation performance and reduced-motion policy.
+ * Spike 659 (phase-164): animation performance and reduced-motion policy.
  *
  * The root layout reads the server flag and stamps `data-phase-motion="lean"`
  * on <html>. Client components read that attribute instead of the env var, so
@@ -7,16 +7,16 @@
  * disagree. With the flag off the attribute is absent and every helper here
  * reports legacy behavior.
  *
- * Rollback: unset NEXT_PUBLIC_FEATURE_PHASE_159 / FEATURE_PHASE_159 and restart.
+ * Rollback: unset NEXT_PUBLIC_FEATURE_PHASE_164 / FEATURE_PHASE_164 and restart.
  */
 
 /**
  * Build-time switch. A literal `process.env.NEXT_PUBLIC_*` read is inlined by
  * Next into server and client bundles alike, so render-time branches agree
- * during hydration. FEATURE_PHASE_159 alone is server-only and is not enough.
+ * during hydration. FEATURE_PHASE_164 alone is server-only and is not enough.
  */
 export function leanMotionFlag(): boolean {
-  const v = (process.env.NEXT_PUBLIC_FEATURE_PHASE_159 ?? "").trim().toLowerCase()
+  const v = (process.env.NEXT_PUBLIC_FEATURE_PHASE_164 ?? "").trim().toLowerCase()
   return v === "1" || v === "true" || v === "yes" || v === "on"
 }
 

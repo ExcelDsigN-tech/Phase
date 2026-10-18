@@ -1,7 +1,7 @@
 /**
- * Spike 659 (phase-159) performance proof: Lighthouse before/after.
+ * Spike 659 (phase-164) performance proof: Lighthouse before/after.
  *
- *   # build A without the flag, build B with NEXT_PUBLIC_FEATURE_PHASE_159=1 (it is build-time)
+ *   # build A without the flag, build B with NEXT_PUBLIC_FEATURE_PHASE_164=1 (it is build-time)
  *   npm run proof:659 -- --base-url https://<build-A> --label off
  *   npm run proof:659 -- --base-url https://<build-B> --label on
  *   npm run proof:659 -- --compare .data/proofs/659-off.json .data/proofs/659-on.json
@@ -81,7 +81,7 @@ async function record() {
   // Match the <html> tag only: the ticker's inline <style> contains the selector text in every build.
   const lean = /<html[^>]*\sdata-phase-motion="lean"/.test(html)
   if (lean !== (label === "on")) {
-    throw new Error(`build at ${base} has lean=${lean} but --label ${label}; rebuild with the right NEXT_PUBLIC_FEATURE_PHASE_159`)
+    throw new Error(`build at ${base} has lean=${lean} but --label ${label}; rebuild with the right NEXT_PUBLIC_FEATURE_PHASE_164`)
   }
 
   mkdirSync(OUT, { recursive: true })
