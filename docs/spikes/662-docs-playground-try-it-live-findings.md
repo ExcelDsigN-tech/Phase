@@ -76,10 +76,12 @@ Signing and faucet steps need testnet and a wallet; see the checklist.
 | Faucet claim tx hash | `<<PASTE>>` |
 | PHASELQ token contract ID in use (from env, not code) | `<<PASTE C…>>` |
 | Signal id returned by `signals.create` | `<<PASTE>>` |
-| `signature_verified` on that signal (`GET /api/signals`) | `<<PASTE true/false>>` |
-| Retry-After seen in the burst | `<<PASTE>>` |
+| `signature_verified` on that signal (`GET /api/signals`) | `true` (Freighter on testnet, local run of this branch, 2026-10-18; `signals.create` returned 201) |
+| Retry-After seen in the burst | `2` (28 of 40 concurrent calls got 429, prod build) |
 | Mainnet wallet fence message (screenshot) | `<<ATTACH>>` |
 | Proof file | `<<PASTE .data/proofs/662-….json>>` |
+
+The first Freighter-signed attempt was rejected with `Invalid signature: payload not signed by this wallet`. That exposed a SEP-53 bug on main: the server verified the raw message bytes instead of `SHA-256("Stellar Signed Message:\n" + message)`. The fix is on `chore/fix-main-baseline` (see `docs/investigations/main-baseline-2026-10-17.md`) and is checked against the official SEP-53 test vectors. After it, the same flow returned 201 with `signature_verified: true`.
 
 ## Follow-up / out of scope for this PR
 
