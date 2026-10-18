@@ -75,7 +75,7 @@ Signing and faucet steps need testnet and a wallet; see the checklist.
 | Preview URL | `<<PASTE>>` |
 | Faucet claim tx hash | `<<PASTE>>` |
 | PHASELQ token contract ID in use (from env, not code) | `<<PASTE C…>>` |
-| Signal id returned by `signals.create` | `<<PASTE>>` |
+| Signal id returned by `signals.create` | `78dtefUb2J`, `X_QqiTXggA` (two signed testnet sends, both 201; the mainnet attempt in between created none) |
 | `signature_verified` on that signal (`GET /api/signals`) | `true` (Freighter on testnet, local run of this branch, 2026-10-18; `signals.create` returned 201) |
 | Retry-After seen in the burst | `2` (28 of 40 concurrent calls got 429, prod build) |
 | Mainnet wallet fence message (screenshot) | "Blocked: your wallet is not on testnet. Switch it to Test SDF Network." (Freighter on Mainnet, 2026-10-18). Screenshot `<<ATTACH>>` |
