@@ -49,21 +49,38 @@ export async function signalProofMessage(payload: SignalProofPayload): Promise<s
   return `phase-signal:v1:${digest}`
 }
 
+/**
+ * SEP-53: the wallet signs SHA-256(prefix + message), not the prefixed bytes
+ * themselves (stellar-protocol ecosystem/sep-0053.md, "Signing" steps 2-4).
+ * Verifying the raw prefixed bytes rejected every real wallet signature.
+ */
+export async function sep53SignedBytes(message: string): Promise<Uint8Array> {
+  const data = new TextEncoder().encode(SIGNATURE_PREFIX + message)
+  return new Uint8Array(await crypto.subtle.digest("SHA-256", data))
+}
+
+/** Server-only: verify a SEP-53 signature by `wallet` over `message`. */
+export async function verifySep53Signature(
+  wallet: string,
+  message: string,
+  signatureBase64: string,
+): Promise<boolean> {
+  try {
+    const { Keypair } = await import("@stellar/stellar-sdk")
+    const signed = Buffer.from(await sep53SignedBytes(message))
+    return Keypair.fromPublicKey(wallet).verify(signed, Buffer.from(signatureBase64, "base64"))
+  } catch {
+    return false
+  }
+}
+
 /** Server-only: verify a SEP-53 Ed25519 signature over the given payload. */
 export async function verifySignalSignature(
   wallet: string,
   payload: SignalProofPayload,
   signatureBase64: string,
 ): Promise<boolean> {
-  try {
-    const { Keypair } = await import("@stellar/stellar-sdk")
-    const message = await signalProofMessage(payload)
-    const data = new TextEncoder().encode(SIGNATURE_PREFIX + message)
-    const signature = Buffer.from(signatureBase64, "base64")
-    return Keypair.fromPublicKey(wallet).verify(data, signature)
-  } catch {
-    return false
-  }
+  return verifySep53Signature(wallet, await signalProofMessage(payload), signatureBase64)
 }
 
 /** Canonical payload signed/proven for a world-role assignment (issue #247). */
@@ -107,15 +124,7 @@ export async function verifyWorldRoleSignature(
   payload: WorldRoleProofPayload,
   signatureBase64: string,
 ): Promise<boolean> {
-  try {
-    const { Keypair } = await import("@stellar/stellar-sdk")
-    const message = await worldRoleProofMessage(payload)
-    const data = new TextEncoder().encode(SIGNATURE_PREFIX + message)
-    const signature = Buffer.from(signatureBase64, "base64")
-    return Keypair.fromPublicKey(wallet).verify(data, signature)
-  } catch {
-    return false
-  }
+  return verifySep53Signature(wallet, await worldRoleProofMessage(payload), signatureBase64)
 }
 
 /**
