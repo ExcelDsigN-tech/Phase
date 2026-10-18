@@ -80,7 +80,7 @@ Signing and faucet steps need testnet and a wallet; see the checklist.
 | Retry-After seen in the burst | `2` (28 of 40 concurrent calls got 429, prod build) |
 | `rpc.call` `getLatestLedger` (testnet, via /api/soroban-rpc) | 200, `sequence` 5255947, `protocolVersion` 29 (2026-10-18) |
 | `rpc.call` unknown method (`fooBar`) | "200 · JSON-RPC error inside an HTTP 200 response" (2026-10-18) |
-| Mainnet wallet fence message (screenshot) | "Blocked: your wallet is not on testnet. Switch it to Test SDF Network." (Freighter on Mainnet, 2026-10-18). Screenshot `<<ATTACH>>` |
+| Mainnet wallet fence message (screenshot) | "Blocked: your wallet is not on testnet. Switch it to Test SDF Network." (Freighter on Mainnet, 2026-10-18). Text copied from the console; no screenshot captured |
 | Proof file | `.data/proofs/662-2026-10-18T06-15-36-736Z.json` (local run, 5/5 PASS, 28/40 got 429 with `Retry-After: 2`) |
 
 The first Freighter-signed attempt was rejected with `Invalid signature: payload not signed by this wallet`. That exposed a SEP-53 bug on main: the server verified the raw message bytes instead of `SHA-256("Stellar Signed Message:\n" + message)`. The fix is on `chore/fix-main-baseline` (see `docs/investigations/main-baseline-2026-10-17.md`) and is checked against the official SEP-53 test vectors. After it, the same flow returned 201 with `signature_verified: true`.
