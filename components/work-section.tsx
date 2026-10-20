@@ -23,7 +23,7 @@ export function WorkSection() {
     if (!sectionRef.current || !headerRef.current || !gridRef.current) return
 
     const ctx = gsap.context(() => {
-      // phase-164: batched compositor-only reveals; reduced motion stays static.
+      // phase-motion: batched compositor-only reveals; reduced motion stays static.
       if (isLeanMotion()) {
         if (prefersReducedMotion()) return
         batchReveal([headerRef.current!], { x: -60 }, { start: "top 90%" })
@@ -122,7 +122,7 @@ function WorkCard({
       ScrollTrigger.create({
         trigger: cardRef.current,
         start: "top 80%",
-        // phase-164: the trigger only ever fires once, so let it kill itself.
+        // phase-motion: the trigger only ever fires once, so let it kill itself.
         once: isLeanMotion(),
         onEnter: () => setIsScrollActive(true),
       })

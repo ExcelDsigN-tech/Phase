@@ -59,7 +59,7 @@ export function HeroSection() {
   useEffect(() => {
     if (!sectionRef.current || !contentRef.current) return
 
-    // phase-164: the LCP section fades on the compositor via a CSS scroll
+    // phase-motion: the LCP section fades on the compositor via a CSS scroll
     // timeline; the gsap scrub stays as the fallback for older engines.
     if (isLeanMotion()) {
       if (prefersReducedMotion()) return

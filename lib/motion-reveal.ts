@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger)
 type RevealFrom = { x?: number; y?: number }
 
 /**
- * Spike 659 (phase-164): one `ScrollTrigger.batch` per element group instead of
+ * Spike 659 (phase-motion): one `ScrollTrigger.batch` per element group instead of
  * one trigger per element. Call inside a `gsap.context` so `ctx.revert()` kills
  * the batch triggers and restores inline styles on unmount. Only transform and
  * opacity are tweened; `will-change` lives only for the duration of a tween.

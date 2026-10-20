@@ -23,7 +23,7 @@ export function HighlightText({ children, className = "", parallaxSpeed = 0.3 }:
 
     const lean = isLeanMotion()
     const ctx = gsap.context(() => {
-      // phase-164: reduced motion shows the settled highlight with no triggers.
+      // phase-motion: reduced motion shows the settled highlight with no triggers.
       if (lean && prefersReducedMotion()) {
         gsap.set(highlightRef.current, { scaleX: 1, transformOrigin: "left center" })
         gsap.set(textRef.current, { color: "#000000" })
@@ -66,7 +66,7 @@ export function HighlightText({ children, className = "", parallaxSpeed = 0.3 }:
         0.5,
       )
 
-      // Parallax effect. phase-164 drops it: a scrub per highlight ran on every scroll frame.
+      // Parallax effect. phase-motion drops it: a scrub per highlight ran on every scroll frame.
       if (lean) return
       gsap.to(highlightRef.current, {
         yPercent: -20 * parallaxSpeed,

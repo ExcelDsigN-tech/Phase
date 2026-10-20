@@ -31,7 +31,7 @@ export function ColophonSection() {
     if (!sectionRef.current) return
 
     const ctx = gsap.context(() => {
-      // phase-164: batched compositor-only reveals; reduced motion stays static.
+      // phase-motion: batched compositor-only reveals; reduced motion stays static.
       if (isLeanMotion()) {
         if (prefersReducedMotion()) return
         batchReveal([headerRef.current].filter(Boolean) as Element[], { x: -60 })

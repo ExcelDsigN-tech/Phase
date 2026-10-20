@@ -631,7 +631,7 @@
   }
 }
 
-/* ─── phase-164 (spike 659): lean motion. Inert unless <html data-phase-motion="lean"> ─── */
+/* ─── phase-motion (spike 659): lean motion. Inert unless <html data-phase-motion="lean"> ─── */
 html[data-phase-motion="lean"] :is(
     .forge-shell--deploying,
     .design-studio-seal-pulse,

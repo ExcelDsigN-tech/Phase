@@ -106,7 +106,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  // phase-164: one server-side switch for the lean motion CSS and client paths.
+  // phase-motion: one server-side switch for the lean motion CSS and client paths.
   const motionAttr = leanMotionFlag() ? { [LEAN_MOTION_ATTR]: LEAN_MOTION_VALUE } : {}
   return (
     <html lang="en" className="dark bg-background" suppressHydrationWarning {...motionAttr}>

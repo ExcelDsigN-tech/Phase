@@ -419,7 +419,7 @@ NEXT_PUBLIC_FEATURE_PHASE_158=1
 NEXT_PUBLIC_FEATURE_PHASE_159=1
 NEXT_PUBLIC_FEATURE_PHASE_160=1
 NEXT_PUBLIC_FEATURE_PHASE_161=1
-NEXT_PUBLIC_FEATURE_PHASE_164=1   # build-time: needs a rebuild to flip
+NEXT_PUBLIC_FEATURE_PHASE_MOTION=1   # build-time: needs a rebuild to flip
 # Server-only aliases also accepted: FEATURE_PHASE_104, etc.
 ```
 
@@ -438,7 +438,7 @@ Rollback: unset the var or set `0` and restart. No ledger migration to revert; o
 
 | Flag | Scope | Rollback |
 |---|---|---|
-| `phase-164` | Lean motion (spike 659): route-scoped Lenis, CSS scroll-timeline hero, batched reveals, WAAPI flap, compositor-only loops, reduced-motion support. Client-visible, so only `NEXT_PUBLIC_FEATURE_PHASE_164` counts | Unset, rebuild, restart. Scoped CSS goes inert, legacy paths run, nothing persisted |
+| `phase-motion` | Lean motion (spike 659): route-scoped Lenis, CSS scroll-timeline hero, batched reveals, WAAPI flap, compositor-only loops, reduced-motion support. Client-visible, so only `NEXT_PUBLIC_FEATURE_PHASE_MOTION` counts | Unset, rebuild, restart. Scoped CSS goes inert, legacy paths run, nothing persisted |
 
 ---
 

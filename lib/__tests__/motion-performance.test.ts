@@ -17,7 +17,7 @@ import {
 
 const root = (attr: string | null) => ({ getAttribute: (n: string) => (n === LEAN_MOTION_ATTR ? attr : null) })
 
-describe("phase-164 smooth scroll scoping", () => {
+describe("phase-motion smooth scroll scoping", () => {
   it("legacy mode keeps the old behaviour: everything except the cockpits", () => {
     expect(smoothScrollAllowed("/", false)).toBe(true)
     expect(smoothScrollAllowed("/explore", false)).toBe(true)
@@ -35,9 +35,9 @@ describe("phase-164 smooth scroll scoping", () => {
   })
 })
 
-describe("phase-164 environment probes", () => {
+describe("phase-motion environment probes", () => {
   afterEach(() => {
-    delete process.env.NEXT_PUBLIC_FEATURE_PHASE_164
+    delete process.env.NEXT_PUBLIC_FEATURE_PHASE_MOTION
   })
 
   it("reads lean mode from the root attribute only", () => {
@@ -48,10 +48,10 @@ describe("phase-164 environment probes", () => {
 
   it("build flag is off by default and only reads the public key", () => {
     expect(leanMotionFlag()).toBe(false)
-    process.env.FEATURE_PHASE_164 = "1"
+    process.env.FEATURE_PHASE_MOTION = "1"
     expect(leanMotionFlag()).toBe(false)
-    delete process.env.FEATURE_PHASE_164
-    process.env.NEXT_PUBLIC_FEATURE_PHASE_164 = "true"
+    delete process.env.FEATURE_PHASE_MOTION
+    process.env.NEXT_PUBLIC_FEATURE_PHASE_MOTION = "true"
     expect(leanMotionFlag()).toBe(true)
   })
 
@@ -70,7 +70,7 @@ describe("phase-164 environment probes", () => {
   })
 })
 
-describe("phase-164 flap schedule", () => {
+describe("phase-motion flap schedule", () => {
   it("matches the legacy timing", () => {
     const s = buildFlapSchedule("P H", { replay: false, reducedMotion: false })
     expect(s).toEqual([
@@ -95,7 +95,7 @@ describe("phase-164 flap schedule", () => {
   })
 })
 
-describe("phase-164 transient will-change", () => {
+describe("phase-motion transient will-change", () => {
   it("sets the hint while the animation runs and clears it after", async () => {
     let finish!: () => void
     const finished = new Promise<void>((r) => {
@@ -120,14 +120,14 @@ describe("phase-164 transient will-change", () => {
   })
 })
 
-describe("phase-164 CSS overrides", () => {
+describe("phase-motion CSS overrides", () => {
   const LEAN = 'html[data-phase-motion="lean"]'
   const files = ["app/globals.css", "app/tactical-command.css", "components/system-ticker.tsx"]
 
   function leanSection(file: string): string {
     const src = fs.readFileSync(path.resolve(__dirname, "../..", file), "utf8")
     const css = file.endsWith(".tsx") ? (src.match(/const TICKER_CSS = `([\s\S]*?)`/)?.[1] ?? "") : src
-    const marker = css.indexOf("phase-164")
+    const marker = css.indexOf("phase-motion")
     return marker === -1 ? "" : css.slice(css.lastIndexOf("/*", marker))
   }
 

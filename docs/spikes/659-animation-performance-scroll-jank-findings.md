@@ -14,9 +14,9 @@ Global Lenis + ScrollTrigger + a gsap ticker rAF run on every route, the hero sc
 - `tactical-command.css` set `will-change: transform, opacity, box-shadow, filter` permanently on five classes. Eighteen infinite loops animated `box-shadow`, `border-color`, `filter`, `color` or `background-position`.
 - The ticker shipped inline `will-change: transform` and ignored reduced motion. Skeletons (`animate-pulse`) ignored it too.
 
-## Delivered in this PR (phase-164)
+## Delivered in this PR (phase-motion)
 
-One switch: the root layout stamps `data-phase-motion="lean"` on `<html>` when `NEXT_PUBLIC_FEATURE_PHASE_164` is set. Every CSS override sits under that attribute selector and every JS branch reads the same value, so with the flag off the attribute is absent and the old code path runs untouched.
+One switch: the root layout stamps `data-phase-motion="lean"` on `<html>` when `NEXT_PUBLIC_FEATURE_PHASE_MOTION` is set. Every CSS override sits under that attribute selector and every JS branch reads the same value, so with the flag off the attribute is absent and the old code path runs untouched.
 
 1. **Route-scoped smooth scroll** (`components/smooth-scroll.tsx`, `lib/motion-performance.ts:smoothScrollAllowed`): lean mode only mounts Lenis on `/` (the landing page with scroll-driven sections) and never under reduced motion. `/explore`, `/docs` and other static grids scroll natively with no ticker work.
 2. **Teardown fix** (always on, it is a leak fix): the ticker callback is a named function that is actually removed, `lagSmoothing` returns to gsap's default, the Lenis scroll listener is detached, and lean mode refreshes ScrollTrigger so no trigger keeps stale positions.
@@ -43,7 +43,7 @@ The issue's five questions are the shared template for this batch, written aroun
 2. **Replay and idempotency per write.** Not applicable: this spike adds no writes. The only state is the per-viewer flap audio mute toggle, which lives in React state and isn't persisted.
 3. **Contract-ID drift, issuer rotation, gateway failover.** Not applicable. The ticker's live stats (Horizon, Soroban RPC, CoinGecko, timeapi) already fail soft to `—`. Note that the app's CSP blocks CoinGecko and timeapi, so those two values never load in the browser (pre-existing, recorded in the baseline notes).
 4. **409/429/412 taxonomy and recovery without losing input.** Not applicable: no requests or forms are added.
-5. **Migration and rollback.** No WASM, schema or data change. `NEXT_PUBLIC_FEATURE_PHASE_164` is inlined at build time, so rollback is unset, **rebuild**, redeploy. Without the attribute, every lean CSS rule is inert and the legacy JS paths run. The teardown fix stays on either way because it's a leak fix.
+5. **Migration and rollback.** No WASM, schema or data change. `NEXT_PUBLIC_FEATURE_PHASE_MOTION` is inlined at build time, so rollback is unset, **rebuild**, redeploy. Without the attribute, every lean CSS rule is inert and the legacy JS paths run. The teardown fix stays on either way because it's a leak fix.
 
 ## Acceptance criteria status
 
@@ -58,7 +58,7 @@ The issue's five questions are the shared template for this batch, written aroun
 
 ## Verified in this session
 
-Headless Chromium against `next dev` with `NEXT_PUBLIC_FEATURE_PHASE_164=1`:
+Headless Chromium against `next dev` with `NEXT_PUBLIC_FEATURE_PHASE_MOTION=1` (then named `NEXT_PUBLIC_FEATURE_PHASE_159`):
 
 | Check | Normal motion | `prefers-reduced-motion: reduce` |
 |---|---|---|
@@ -73,7 +73,7 @@ On `/explore`, Lenis is off. `npm run proof:659` was run once against the dev se
 
 ## Lab results (production builds, cloud container)
 
-Two `next build && next start` builds of this branch: **A** without the flag, **B** with `NEXT_PUBLIC_FEATURE_PHASE_164=1`. Lighthouse 12.2.1, mobile form factor, simulated throttling, median of 5 runs per route, two full passes. The container's CPU isn't a real phone, and outbound requests to Stellar, CoinGecko and Google were blocked, so read these as relative, not absolute.
+Two `next build && next start` builds of this branch: **A** without the flag, **B** with `NEXT_PUBLIC_FEATURE_PHASE_MOTION=1` (then named `NEXT_PUBLIC_FEATURE_PHASE_159`). Lighthouse 12.2.1, mobile form factor, simulated throttling, median of 5 runs per route, two full passes. The container's CPU isn't a real phone, and outbound requests to Stellar, CoinGecko and Google were blocked, so read these as relative, not absolute.
 
 | Route | Metric | A (off) pass 1 / 2 | B (on) pass 1 / 2 | Change |
 |---|---|---|---|---|
@@ -101,7 +101,7 @@ The flag-off columns are the legacy behavior the issue describes (reduced motion
 
 ## Live proof checklist (run by the maintainer)
 
-1. Make two production builds of this branch: **A** without `NEXT_PUBLIC_FEATURE_PHASE_164`, **B** with `NEXT_PUBLIC_FEATURE_PHASE_164=1` (Vercel previews or `next build && next start` on two ports).
+1. Make two production builds of this branch: **A** without `NEXT_PUBLIC_FEATURE_PHASE_MOTION`, **B** with `NEXT_PUBLIC_FEATURE_PHASE_MOTION=1` (Vercel previews or `next build && next start` on two ports).
 2. `npm run proof:659 -- --base-url <A> --label off --runs 5`, then `npm run proof:659 -- --base-url <B> --label on --runs 5`. The script refuses a mislabeled build.
 3. `npm run proof:659 -- --compare .data/proofs/659-off.json .data/proofs/659-on.json` and paste the table below.
 4. Low-end Android trace: on a real device (or Chrome DevTools, Performance, CPU 6x slowdown), record 10 s of scrolling `/` on A and on B, then note long tasks over 50 ms and dropped frames.

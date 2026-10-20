@@ -52,7 +52,7 @@
  * - phase-161: typed contract-error taxonomy — code-stable PhaseError
  *   descriptors with retryable hints and message keys (partial slice of spike
  *   660 / issue #523)
- * - phase-164: route-scoped smooth scroll, compositor-only motion, reduced-motion
+ * - phase-motion: route-scoped smooth scroll, compositor-only motion, reduced-motion
  *   aware flap/ticker (spike 659 / issue #522)
  */
 
@@ -130,7 +130,7 @@ export type PhaseFeatureFlag =
   | "phase-159"
   | "phase-160"
   | "phase-161"
-  | "phase-164";
+  | "phase-motion";
 
 const FLAG_ENV_MAP: Record<PhaseFeatureFlag, string[]> = {
   "phase-66": ["NEXT_PUBLIC_FEATURE_PHASE_66", "FEATURE_PHASE_66"],
@@ -206,7 +206,7 @@ const FLAG_ENV_MAP: Record<PhaseFeatureFlag, string[]> = {
   "phase-159": ["NEXT_PUBLIC_FEATURE_PHASE_159", "FEATURE_PHASE_159"],
   "phase-160": ["NEXT_PUBLIC_FEATURE_PHASE_160", "FEATURE_PHASE_160"],
   "phase-161": ["NEXT_PUBLIC_FEATURE_PHASE_161", "FEATURE_PHASE_161"],
-  "phase-164": ["NEXT_PUBLIC_FEATURE_PHASE_164", "FEATURE_PHASE_164"],
+  "phase-motion": ["NEXT_PUBLIC_FEATURE_PHASE_MOTION", "FEATURE_PHASE_MOTION"],
 };
 
 function isTruthy(v: string | undefined): boolean {
@@ -315,7 +315,7 @@ export function getEnabledFeatureFlags(): PhaseFeatureFlag[] {
     "phase-159",
     "phase-160",
     "phase-161",
-    "phase-164",
+    "phase-motion",
   ];
   // Filtering is evaluated at call time, allowing runtime test overrides.
   return all.filter(isFeatureEnabled)

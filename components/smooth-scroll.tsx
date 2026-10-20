@@ -15,7 +15,7 @@ gsap.registerPlugin(ScrollTrigger)
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const lenisRef = useRef<Lenis | null>(null)
-  // phase-164: lean mode runs Lenis only on routes with scroll-driven sections
+  // phase-motion: lean mode runs Lenis only on routes with scroll-driven sections
   // and never under prefers-reduced-motion. Legacy mode skips only the cockpits.
   const lean = isLeanMotion()
   const allowed = smoothScrollAllowed(pathname, lean) && !(lean && prefersReducedMotion())
