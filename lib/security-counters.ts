@@ -95,7 +95,30 @@ export type SecurityCounterName =
   | "quest_arcs_superseded"
   | "staked_fee_discount_applied"
   | "support_bot_errors_diagnosed"
-  | "support_bot_queries_total";
+  | "support_bot_queries_total"
+  | "qr_generated_receive"
+  | "qr_generated_referral"
+  | "qr_scanned_success"
+  | "qr_scanned_invalid"
+  | "qr_camera_denied"
+  | "wc_session_restored"
+  | "wc_session_expired"
+  | "wc_reconnect_success"
+  | "wc_reconnect_failed"
+  | "wc_chain_mismatch_blocked"
+  | "xbull_connect_success"
+  | "xbull_sign_requested"
+  | "xbull_sign_success"
+  | "xbull_sign_rejected"
+  | "xbull_trustline_signed"
+  | "xbull_trustline_success"
+  | "xbull_error_mapped"
+  | "ledger_clear_signing_reviewed"
+  | "ledger_clear_signing_approved"
+  | "ledger_clear_signing_rejected"
+  | "ledger_blind_signing_blocked"
+  | "ledger_gate13_preempted";
+
 
 const counters = new Map<SecurityCounterName, number>()
 
@@ -118,6 +141,8 @@ export const MODERATION_DECISIONS = ["auto_allow", "human_review", "auto_hold"] 
 export function incSecurityCounter(name: SecurityCounterName, by = 1): void {
   counters.set(name, (counters.get(name) ?? 0) + by)
 }
+
+export const recordSecurityCounter = incSecurityCounter
 
 export function getSecurityCounter(name: SecurityCounterName): number {
   return counters.get(name) ?? 0

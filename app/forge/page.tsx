@@ -5,6 +5,7 @@ import dynamic from "next/dynamic"
 import { createPortal } from "react-dom"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { signTransaction } from "@/lib/stellar-wallet-kit"
+import { recordMobileDeepLinkReturn } from "@/lib/walletconnect-resilience"
 import { FeeBumpTransaction, Transaction, TransactionBuilder, Networks } from "@stellar/stellar-sdk"
 import { LangToggle } from "@/components/lang-toggle"
 import { useLang } from "@/components/lang-context"
@@ -26,7 +27,10 @@ const TrustlineButton = dynamic(
   },
 )
 import { useWallet } from "@/components/wallet-provider"
+import { isFeatureEnabled } from "@/lib/feature-flags"
+import { decodeSorobanTransaction } from "@/lib/ledger-soroban-decoder"
 import { pickCopy } from "@/lib/phase-copy"
+
 import { humanizePhaseHostErrorMessage } from "@/lib/phase-host-error"
 import { composeImageWithPhaseForgeSeal } from "@/lib/forge-seal-image"
 import { isIpfsUploadConfigured, uploadToIPFS } from "@/lib/ipfs-upload"
@@ -219,7 +223,8 @@ export default function ForgePage() {
   const n = copy.nav
   const ch = copy.chamber
 
-  const { address, connect, disconnect, connecting, refresh } = useWallet()
+  const { address, connect, disconnect, connecting, refresh, isHardwareWallet, requestLedgerReview } = useWallet()
+
 
   const [name, setName] = useState("")
   const [priceLiq, setPriceLiq] = useState("1")
@@ -518,6 +523,16 @@ export default function ForgePage() {
 
       try {
         const txEnvelopeCreate = await buildCreateCollectionTransaction(addr, trimmedName, stroops, finalUri)
+        recordMobileDeepLinkReturn()
+        if (isHardwareWallet && isFeatureEnabled("phase-169") && requestLedgerReview) {
+          const decoded = decodeSorobanTransaction(txEnvelopeCreate, NETWORK_PASSPHRASE)
+          if (decoded) {
+            const approved = await requestLedgerReview(decoded)
+            if (!approved) {
+              throw new Error("Ledger: clear-signing review rejected by user")
+            }
+          }
+        }
         const signCreate = await signTransaction(txEnvelopeCreate, {
           networkPassphrase: NETWORK_PASSPHRASE,
           address: addr,
@@ -542,7 +557,17 @@ export default function ForgePage() {
         try {
           const invoiceId = Math.floor(Math.random() * 1_000_000)
           const txEnvelopeMint = await buildSettleTransaction(addr, stroops, invoiceId, id)
+          if (isHardwareWallet && isFeatureEnabled("phase-169") && requestLedgerReview) {
+            const decoded = decodeSorobanTransaction(txEnvelopeMint, NETWORK_PASSPHRASE)
+            if (decoded) {
+              const approved = await requestLedgerReview(decoded)
+              if (!approved) {
+                throw new Error("Ledger: clear-signing review rejected by user")
+              }
+            }
+          }
           const signMint = await signTransaction(txEnvelopeMint, {
+
             networkPassphrase: NETWORK_PASSPHRASE,
             address: addr,
           })

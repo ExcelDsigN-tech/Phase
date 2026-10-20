@@ -556,6 +556,35 @@ fn resolve_image_to_https(env: &Env, raw: &String) -> String {
     }
 }
 
+/// SEP-50: construye propiedades del NFT como JSON string.
+/// Incluye: collection, token_id, phase_level, rarity, created_at.
+fn build_metadata_properties(env: &Env, token_id: u64, phase_level: Option<String>) -> String {
+    let mut props = Bytes::from_slice(env, b"{");
+    append_literal_to_bytes(&mut props, b"\"token_id\":");
+    let id_str = u64_to_dec_string(env, token_id);
+    append_soroban_str_to_bytes(&mut props, &id_str);
+
+    if let Some(level) = phase_level {
+        if level.len() > 0 {
+            append_literal_to_bytes(&mut props, b",\"phase_level\":\"");
+            append_soroban_str_to_bytes(&mut props, &level);
+            append_literal_to_bytes(&mut props, b"\"");
+        }
+    }
+
+    let col_id_opt: Option<u64> = env.storage().persistent().get(&DataKey::TokenCollection(token_id));
+    if let Some(cid) = col_id_opt {
+        if cid > 0 {
+            append_literal_to_bytes(&mut props, b",\"collection_id\":");
+            let cid_str = u64_to_dec_string(env, cid);
+            append_soroban_str_to_bytes(&mut props, &cid_str);
+        }
+    }
+
+    append_literal_to_bytes(&mut props, b"}");
+    bytes_to_bounded_string(env, &props, 512)
+}
+
 /// Eventos alineados con OpenZeppelin / borrador SEP-50 para indexadores y wallets que lean por eventos.
 /// SEP-50 mint event: topics=["mint", recipient], data=token_id (u64)
 fn emit_indexer_mint(env: &Env, to: Address, token_id: u64) {
@@ -1374,6 +1403,7 @@ impl PhaseProtocol {
     }
 
     /// SEP-0050: metadatos como `Map<Symbol, String>`. `image` resuelto a HTTPS (ipfs:// → gateway).
+    /// Incluye campos requeridos: name, description, image, mime_type, properties.
     pub fn token_metadata(env: Env, token_id: u32) -> Map<Symbol, String> {
         if env
             .storage()
@@ -1385,13 +1415,16 @@ impl PhaseProtocol {
         }
         let name = build_token_display_name(&env, token_id as u64);
         let phase_level = Self::get_phase_level(env.clone(), token_id as u64);
-        let description = build_metadata_description_string(&env, phase_level);
+        let description = build_metadata_description_string(&env, phase_level.clone());
         let raw_image = build_token_image_raw_string(&env, token_id as u64);
         let image = resolve_image_to_https(&env, &raw_image);
         let mut m = Map::new(&env);
         m.set(Symbol::new(&env, "name"), name);
         m.set(Symbol::new(&env, "description"), description);
         m.set(Symbol::new(&env, "image"), image);
+        m.set(Symbol::new(&env, "mime_type"), String::from_str(&env, "image/png"));
+        let props = build_metadata_properties(&env, token_id as u64, phase_level);
+        m.set(Symbol::new(&env, "properties"), props);
         m
     }
 

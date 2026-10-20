@@ -734,6 +734,47 @@ export const phaseCopy: Record<
     pricing: PricingCopy
     moderationQueue: ModerationQueueCopy
     questArcs: QuestArcCopy
+    qrFlows: {
+      receiveTitle: string
+      scanTitle: string
+      shareReferral: string
+      scanPrompt: string
+      copyUri: string
+      copied: string
+      requestAmount: string
+      scanQr: string
+      viewQr: string
+      manualEntry: string
+      cameraError: string
+    }
+    walletConnectResilience: {
+      title: string
+      reconnectPrompt: string
+      chainMismatch: string
+      openMobileWallet: string
+      relayDisconnected: string
+      reconnectedToast: string
+    }
+    xbullParity: {
+      badge: string
+      signPrompt: string
+      trustlinePrompt: string
+      rejected: string
+      networkMismatch: string
+    }
+    ledgerClearSigning: {
+      title: string
+      description: string
+      targetContract: string
+      hostFunction: string
+      verificationCode: string
+      matchCodePrompt: string
+      acknowledgePrompt: string
+      approveButton: string
+      cancelButton: string
+      blindSigningDisabled: string
+      gate13RiskAlert: string
+    }
   }
 > = {
   en: {
@@ -1349,7 +1390,50 @@ export const phaseCopy: Record<
         identityBlocked: "This wallet is not eligible for quest arcs.",
       },
     },
+    qrFlows: {
+      receiveTitle: "◈ RECEIVE ASSETS",
+      scanTitle: "◈ SCAN QR CODE",
+      shareReferral: "◈ SHARE REFERRAL QR",
+      scanPrompt: "Position QR code within viewfinder",
+      copyUri: "[ COPY URI ]",
+      copied: "[ COPIED! ]",
+      requestAmount: "Request Amount",
+      scanQr: "Scan QR",
+      viewQr: "Show QR",
+      manualEntry: "Or enter address manually",
+      cameraError: "Camera access unavailable",
+    },
+    walletConnectResilience: {
+      title: "WalletConnect v2 Resilience",
+      reconnectPrompt: "WalletConnect session dropped. Click Reconnect to restore mobile link.",
+      chainMismatch: "Wallet chain mismatch: your wallet is connected to a different network. Switch to Stellar Testnet in your mobile wallet.",
+      openMobileWallet: "Open mobile wallet to sign",
+      relayDisconnected: "Relay websocket connection lost. Attempting auto-reconnect…",
+      reconnectedToast: "WalletConnect session restored successfully.",
+    },
+    xbullParity: {
+      badge: "xBull",
+      signPrompt: "Confirm transaction in xBull wallet",
+      trustlinePrompt: "Confirm PHASELQ trustline in xBull wallet",
+      rejected: "Transaction rejected in xBull wallet",
+      networkMismatch: "xBull network mismatch: please switch to Stellar Testnet",
+    },
+    ledgerClearSigning: {
+      title: "Ledger Clear-Signing Review",
+      description: "Inspect call parameters before transmitting payload to hardware",
+      targetContract: "Target Contract",
+      hostFunction: "Host Function",
+      verificationCode: "Ledger Verification Code",
+      matchCodePrompt: "Match with on-device hash pre-image",
+      acknowledgePrompt: "I have verified the contract ID and parameters match my intent",
+      approveButton: "Verify & Send to Device",
+      cancelButton: "Cancel",
+      blindSigningDisabled: "Blind signing is disabled in Ledger Stellar app settings. Set to Enabled or Clear signing to continue.",
+      gate13RiskAlert: "Contract Execution Blocked: Gate #13 Pre-empted (SelfTransfer or invalid authorization).",
+    },
   },
+
+
   es: {
     nav: {
       home: "← Inicio",
@@ -1965,7 +2049,50 @@ export const phaseCopy: Record<
         identityBlocked: "Esta wallet no es elegible para arcos de misiones.",
       },
     },
+    qrFlows: {
+      receiveTitle: "◈ RECIBIR ACTIVOS",
+      scanTitle: "◈ ESCANEAR CÓDIGO QR",
+      shareReferral: "◈ COMPARTIR QR DE REFERIDO",
+      scanPrompt: "Posicioná el código QR dentro del visor",
+      copyUri: "[ COPIAR URI ]",
+      copied: "[ ¡COPIADO! ]",
+      requestAmount: "Monto solicitado",
+      scanQr: "Escanear QR",
+      viewQr: "Ver QR",
+      manualEntry: "O ingresá la dirección manualmente",
+      cameraError: "Acceso a cámara no disponible",
+    },
+    walletConnectResilience: {
+      title: "Resiliencia WalletConnect v2",
+      reconnectPrompt: "Sesión WalletConnect interrumpida. Hacé clic en Reconectar para restaurar el enlace móvil.",
+      chainMismatch: "Red incorrecta en wallet: tu wallet está conectada a otra red. Cambiá a Stellar Testnet en tu wallet móvil.",
+      openMobileWallet: "Abrir wallet móvil para firmar",
+      relayDisconnected: "Conexión con el relay perdida. Intentando reconexión automática…",
+      reconnectedToast: "Sesión de WalletConnect restaurada con éxito.",
+    },
+    xbullParity: {
+      badge: "xBull",
+      signPrompt: "Confirmar transacción en la billetera xBull",
+      trustlinePrompt: "Confirmar línea de confianza PHASELQ en xBull",
+      rejected: "Transacción rechazada en la billetera xBull",
+      networkMismatch: "Red de xBull incorrecta: por favor seleccioná Stellar Testnet",
+    },
+    ledgerClearSigning: {
+      title: "Revisión Clear-Signing de Ledger",
+      description: "Inspeccioná los parámetros antes de transmitir la carga al dispositivo",
+      targetContract: "Contrato destino",
+      hostFunction: "Función host",
+      verificationCode: "Código de verificación Ledger",
+      matchCodePrompt: "Compará con la preimagen en la pantalla del dispositivo",
+      acknowledgePrompt: "Verifiqué que el ID de contrato y los parámetros coinciden con mi intención",
+      approveButton: "Verificar y enviar al dispositivo",
+      cancelButton: "Cancelar",
+      blindSigningDisabled: "Firma ciega deshabilitada en la app Stellar del Ledger. Habilitá Blind signing en Configuración.",
+      gate13RiskAlert: "Ejecución bloqueada: Gate #13 prevenido (auto-transferencia o autorización inválida).",
+    },
   },
+
+
 }
 
 /** Only accept locales that are part of the copy registry.  This deliberately
