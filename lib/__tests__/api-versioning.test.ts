@@ -25,7 +25,7 @@ const V: ApiVersion[] = [
 ]
 const NOW = new Date("2026-10-17T12:00:00Z")
 
-describe("phase-163 negotiation", () => {
+describe("phase-api-versioning negotiation", () => {
   it("defaults to the current version without headers", () => {
     expect(negotiateApiVersion(h({}), { versions: V, now: NOW })).toEqual({
       ok: true,
@@ -77,7 +77,7 @@ describe("phase-163 negotiation", () => {
   })
 })
 
-describe("phase-163 response headers", () => {
+describe("phase-api-versioning response headers", () => {
   it("echoes the version and Vary on every response", () => {
     expect(versionResponseHeaders("GET", "/api/market", "2026-10-17", { versions: V, deprecations: [] })).toEqual({
       "X-API-Version": "2026-10-17",
@@ -113,7 +113,7 @@ describe("phase-163 response headers", () => {
   })
 })
 
-describe("phase-163 Vary superset", () => {
+describe("phase-api-versioning Vary superset", () => {
   it("covers every Vary token an /api route sets, so the middleware cannot drop a cache key", () => {
     const root = path.resolve(__dirname, "../../app/api")
     const files: string[] = []
@@ -137,7 +137,7 @@ describe("phase-163 Vary superset", () => {
   })
 })
 
-describe("phase-163 contract", () => {
+describe("phase-api-versioning contract", () => {
   const doc = buildOpenApiDocument()
 
   it("covers every operation once with deterministic status codes", () => {
@@ -193,9 +193,9 @@ describe("phase-163 contract", () => {
   })
 })
 
-describe("phase-163 middleware", () => {
+describe("phase-api-versioning middleware", () => {
   afterEach(() => {
-    delete process.env.FEATURE_PHASE_163
+    delete process.env.FEATURE_PHASE_API_VERSIONING
   })
 
   const req = (url: string, headers: Record<string, string> = {}, method = "GET") =>
@@ -209,7 +209,7 @@ describe("phase-163 middleware", () => {
   })
 
   it("flag on: echoes the negotiated version and forwards it to the handler", () => {
-    process.env.FEATURE_PHASE_163 = "1"
+    process.env.FEATURE_PHASE_API_VERSIONING = "1"
     const res = middleware(req("/api/market"))
     expect(res.headers.get("X-API-Version")).toBe(currentApiVersion())
     expect(res.headers.get("x-middleware-request-x-phase-api-version")).toBe(currentApiVersion())
@@ -217,7 +217,7 @@ describe("phase-163 middleware", () => {
   })
 
   it("flag on: rejects unsupported versions with a typed 406", async () => {
-    process.env.FEATURE_PHASE_163 = "1"
+    process.env.FEATURE_PHASE_API_VERSIONING = "1"
     const res = middleware(req("/api/market", { "Accept-Version": "1999-01-01" }))
     expect(res.status).toBe(406)
     expect(await res.json()).toEqual({
@@ -228,7 +228,7 @@ describe("phase-163 middleware", () => {
   })
 
   it("flag on: pages and CORS preflights are left alone", () => {
-    process.env.FEATURE_PHASE_163 = "1"
+    process.env.FEATURE_PHASE_API_VERSIONING = "1"
     expect(middleware(req("/explore", { "X-API-Version": "nope" })).headers.get("X-API-Version")).toBeNull()
     expect(middleware(req("/api/metadata/1", { "X-API-Version": "nope" }, "OPTIONS")).status).toBe(200)
   })

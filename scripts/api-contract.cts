@@ -1,5 +1,5 @@
 /**
- * Spike 663 (phase-163): API contract snapshot + breaking-change gate.
+ * Spike 663 (phase-api-versioning): API contract snapshot + breaking-change gate.
  *
  *   npm run api:contract                       # check, exit 0 when clean
  *   npm run api:contract -- --write            # regenerate docs/api/*.json

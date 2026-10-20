@@ -28,7 +28,7 @@ function getErrorMessage(error: unknown): string {
 export function createApiRequestContext(request: NextRequest, route: string) {
   const startedAt = Date.now()
   const correlationId = getIncomingCorrelationId(request)
-  // phase-163: only a version the middleware negotiated is logged, so the label set stays closed.
+  // phase-api-versioning: only a version the middleware negotiated is logged, so the label set stays closed.
   const forwardedVersion = request.headers.get(FORWARDED_API_VERSION_HEADER)
   const apiVersion = isKnownApiVersion(forwardedVersion) ? forwardedVersion : undefined
 
