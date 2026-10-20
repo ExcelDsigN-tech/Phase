@@ -49,7 +49,7 @@
 
 ## Lab results (production build, cloud container)
 
-`next build` with `NEXT_PUBLIC_FEATURE_PHASE_DOCS_PLAYGROUND=1`, `next start` with `FEATURE_PHASE_API_VERSIONING=1`, run on 2026-10-18. `npm run proof:662 -- --burst 40` passed 5/5:
+`next build` with `NEXT_PUBLIC_FEATURE_PHASE_DOCS_PLAYGROUND=1`, `next start` with `FEATURE_PHASE_API_VERSIONING=1`, run on 2026-10-18 (the flags were then named `phase-162` / `phase-163`; only the names changed since). `npm run proof:662 -- --burst 40` passed 5/5:
 
 - the console section is rendered on `/docs`;
 - the proxy's JSON-RPC error inside HTTP 200 is classified as `jsonrpc_error` (this container can't reach Soroban testnet, so it was the proxy's own `-32603` failover envelope);

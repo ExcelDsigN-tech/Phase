@@ -690,3 +690,19 @@ export function screenInBackground(input: Parameters<typeof enqueueForModeration
     return null
   }
 }
+
+/**
+ * phase-168 / Spike 635: Export triage queue items for regulatory audit with author wallet redaction.
+ */
+export function exportTriageItemsForAudit(role: "moderator" | "regulator" = "moderator"): QueueItem[] {
+  const db = getDb();
+  const rows = db.prepare("SELECT * FROM moderation_queue ORDER BY created_at ASC LIMIT 500").all() as unknown as QueueItem[];
+  if (role === "regulator") {
+    return rows.map((r) => ({
+      ...r,
+      author_wallet: `${r.author_wallet.slice(0, 4)}...${r.author_wallet.slice(-4)}`,
+    }));
+  }
+  return rows;
+}
+

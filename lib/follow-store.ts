@@ -586,3 +586,16 @@ export function summarizeCostByOperation(): {
 export function __resetCostLedgerForTests(): void {
   costLedger.length = 0;
 }
+
+/**
+ * phase-167 / Spike 634: Export follow graph entries for GDPR Article 20 data portability.
+ */
+export async function exportFollowsForWallet(wallet: string): Promise<{ following: string[]; followers: string[] }> {
+  const store = await readStore();
+  const entry = store[wallet] ?? { following: [], followers: [] };
+  return {
+    following: [...entry.following],
+    followers: [...entry.followers],
+  };
+}
+

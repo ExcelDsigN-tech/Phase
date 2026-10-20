@@ -282,6 +282,8 @@ export async function getNotifications(wallet: string, limit = 30): Promise<Noti
 }
 
 export async function markRead(wallet: string, notificationId: string): Promise<void> {
+  const { assertNoLegalHold } = await import("@/lib/legal-hold");
+  await assertNoLegalHold("wallet", wallet, "mark_read");
   await updateStore<NotificationStore>("notifications", (store) => {
     const list = store[wallet]
     if (!list) return
@@ -290,6 +292,8 @@ export async function markRead(wallet: string, notificationId: string): Promise<
 }
 
 export async function markAllRead(wallet: string): Promise<void> {
+  const { assertNoLegalHold } = await import("@/lib/legal-hold");
+  await assertNoLegalHold("wallet", wallet, "mark_all_read");
   await updateStore<NotificationStore>("notifications", (store) => {
     const list = store[wallet]
     if (!list) return
@@ -506,4 +510,15 @@ export function auditFaucetAnalyticsWiring(): { ok: boolean; note: string } {
 export type SpikeNotificationKind = "drop_started" | "drop_queue_position" | "dutch_tick";
 export function spikeNotificationType(kind: SpikeNotificationKind): string {
   return kind;
+}
+
+/**
+ * phase-167 / Spike 634: Export notifications and preferences for GDPR Article 20 data portability.
+ */
+export async function exportNotificationsForWallet(
+  wallet: string,
+): Promise<{ items: Notification[]; preferences: NotificationPreferences }> {
+  const items = await getNotifications(wallet);
+  const preferences = await getNotificationPreferences(wallet);
+  return { items, preferences };
 }

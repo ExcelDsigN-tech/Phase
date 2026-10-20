@@ -4,8 +4,8 @@ Branch `chore/fix-main-baseline`, cut from `main` at `74308a0`.
 
 | Check | Before | After |
 |---|---|---|
-| `tsc --noEmit` | 120 errors | 0 |
-| `vitest run` | 32 failed / 351 passed, 1 file not loading | 414 passed (56 files, after merging upstream #573) |
+| `tsc --noEmit` | 120 errors | 7, all in upstream's `lib/__tests__/xbull-adapter.test.ts` (below) |
+| `vitest run` | 32 failed / 351 passed, 1 file not loading | 564 passed / 9 failed (77 files, after merging upstream to `11cb3bc`; upstream alone: 54 failed) |
 | `next build` | failed, 12 errors | passes (3 file-tracing warnings, below) |
 | `npm run lint` | could not start (no `eslint-config-next`) | runs: 286 errors, 106 warnings, all pre-existing |
 | `cargo test` mock-token | failed to build | 1 passed |
@@ -34,6 +34,18 @@ Branch `chore/fix-main-baseline`, cut from `main` at `74308a0`.
 The `DataKey` variants from 3e4b562 (`EditionCounter`, `EditionCap`, `SplitPayees`, `DropWindow`, `DutchConfig`) and the raffle ones are missing too. `lib/phase-protocol.ts:spikeContractErrorCode` still maps `#18`..`#21` to the edition codes, which now collide with `Coin*` on main.
 
 The original values exist in history but conflict, so restoring them means choosing new numbers for two of the three sets. That changes on-chain error codes and the TS mapping, so it was not done here. A maintainer needs to decide the final numbering (and whether any of these WASMs is already deployed with its numbering).
+
+## Upstream merge to 11cb3bc (2026-10-20)
+
+Upstream main at `11cb3bc` has 152 tsc errors and 54 failing tests on its own. After merging it here: 7 tsc errors and 9 failing tests, all in code added by spikes 623, 624, 628, 629 and the moderation export. Fixed in the merge: `phase-170`..`phase-173` were used but never registered as flags, the `qrFlows` / `walletConnectResilience` / `xbullParity` / `ledgerClearSigning` copy blocks had no type, `legalHolds` / `termsConsents` / `legalDocuments` were missing from the data paths, the fusion chamber lost its QR scanner imports, `@ts-nocheck` and mojibake came back in `wallet-provider.tsx` and `fusion-chamber.tsx`, plus `Uint8Array<ArrayBuffer>` typing in `biometric-unlock.ts` and `window.dataLayer`.
+
+Left for the owning spikes (logic bugs, not merge damage):
+
+- `xbull-adapter.test.ts` (spike 624): imports five exports the adapter never defines and expects `USER_REJECTED` where the adapter returns `REJECTED`. The test and the module disagree, so one of them has to be rewritten by the author. 5 failing tests, 7 tsc errors.
+- `moderation-audit-redaction.test.ts`: the regulator export still contains the raw reporter wallet. Privacy bug.
+- `walletconnect-resilience.test.ts` (spike 623): session topic is not persisted.
+- `biometric-unlock.test.ts` (spike 628): a user cancel surfaces as "no sealed envelope" instead of `CANCELLED`.
+- `wallet-history.test.ts` (spike 629): stale-on-error serves `fresh`.
 
 ## Also found, not fixed
 

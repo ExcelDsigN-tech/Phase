@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { AlbedoSunsetBanner } from "@/components/albedo-sunset-banner"
 import { FreighterConnect } from "@/components/freighter-connect"
 import { LangToggle } from "@/components/lang-toggle"
 import { useWallet } from "@/components/wallet-provider"
@@ -62,6 +63,8 @@ export function FloatingHeader() {
     >
       <BellButton />
       <FreighterConnect trailing={<LangToggle />} />
+      {/* Spike 626: renders a fixed bottom banner only when phase-170 is on and Albedo is selected. */}
+      <AlbedoSunsetBanner />
     </div>
   )
 }

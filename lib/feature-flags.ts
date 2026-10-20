@@ -52,6 +52,20 @@
  * - phase-161: typed contract-error taxonomy — code-stable PhaseError
  *   descriptors with retryable hints and message keys (partial slice of spike
  *   660 / issue #523)
+ * - phase-162: SEP-10 web authentication challenges and sessions replacing
+ *   loose wallet headers (spike 641 / issue #503)
+ * - phase-163: Stellar network resolution with passphrase validation and a
+ *   mainnet cutover acknowledgement (spike 640 / issue #502)
+ * - phase-164: self-attested age bands with 18+/21+ campaign gating (spike 637 / issue #499)
+ * - phase-165: signed creator licensing attestation on world creation (spike 639 / issue #501)
+ * - phase-166: QR code flows for receive, offer-claim and referral share with camera scan (spike 622 / issue #485)
+ * - phase-167: WalletConnect v2 mobile session resilience with reconnect and chain-switch (spike 623 / issue #486)
+ * - phase-168: xBull full support with sign, trustline and Freighter-difference matrix (spike 624 / issue #487)
+ * - phase-169: Ledger blind-signing to clear-signing review for Soroban transactions (spike 625 / issue #488)
+ * - phase-170: Albedo retirement-or-parity plan with flagged sunset (spike 626 / issue #489)
+ * - phase-171: Freighter mobile browser support with in-app UA, injection and return flow (spike 627 / issue #490)
+ * - phase-172: biometric unlock for returning wallets with OS-gated session (spike 628 / issue #491)
+ * - phase-173: Horizon-backed per-wallet transaction history timeline (spike 629 / issue #492)
  * - phase-api-versioning: API version negotiation, deprecation headers and OpenAPI
  *   contract (spike 663 / issue #526)
  * - phase-docs-playground: interactive docs playground / try-it-live API console
@@ -59,6 +73,7 @@
  */
 
 export type PhaseFeatureFlag =
+
   | "phase-66"
   | "phase-77"
   | "phase-78"
@@ -132,8 +147,21 @@ export type PhaseFeatureFlag =
   | "phase-159"
   | "phase-160"
   | "phase-161"
+  | "phase-162"
+  | "phase-163"
+  | "phase-164"
+  | "phase-165"
+  | "phase-166"
+  | "phase-167"
+  | "phase-168"
+  | "phase-169"
+  | "phase-170"
+  | "phase-171"
+  | "phase-172"
+  | "phase-173"
   | "phase-api-versioning"
   | "phase-docs-playground";
+
 
 const FLAG_ENV_MAP: Record<PhaseFeatureFlag, string[]> = {
   "phase-66": ["NEXT_PUBLIC_FEATURE_PHASE_66", "FEATURE_PHASE_66"],
@@ -209,9 +237,22 @@ const FLAG_ENV_MAP: Record<PhaseFeatureFlag, string[]> = {
   "phase-159": ["NEXT_PUBLIC_FEATURE_PHASE_159", "FEATURE_PHASE_159"],
   "phase-160": ["NEXT_PUBLIC_FEATURE_PHASE_160", "FEATURE_PHASE_160"],
   "phase-161": ["NEXT_PUBLIC_FEATURE_PHASE_161", "FEATURE_PHASE_161"],
+  "phase-162": ["NEXT_PUBLIC_FEATURE_PHASE_162", "FEATURE_PHASE_162"],
+  "phase-163": ["NEXT_PUBLIC_FEATURE_PHASE_163", "FEATURE_PHASE_163"],
+  "phase-164": ["NEXT_PUBLIC_FEATURE_PHASE_164", "FEATURE_PHASE_164"],
+  "phase-165": ["NEXT_PUBLIC_FEATURE_PHASE_165", "FEATURE_PHASE_165"],
+  "phase-166": ["NEXT_PUBLIC_FEATURE_PHASE_166", "FEATURE_PHASE_166"],
+  "phase-167": ["NEXT_PUBLIC_FEATURE_PHASE_167", "FEATURE_PHASE_167"],
+  "phase-168": ["NEXT_PUBLIC_FEATURE_PHASE_168", "FEATURE_PHASE_168"],
+  "phase-169": ["NEXT_PUBLIC_FEATURE_PHASE_169", "FEATURE_PHASE_169"],
+  "phase-170": ["NEXT_PUBLIC_FEATURE_PHASE_170", "FEATURE_PHASE_170"],
+  "phase-171": ["NEXT_PUBLIC_FEATURE_PHASE_171", "FEATURE_PHASE_171"],
+  "phase-172": ["NEXT_PUBLIC_FEATURE_PHASE_172", "FEATURE_PHASE_172"],
+  "phase-173": ["NEXT_PUBLIC_FEATURE_PHASE_173", "FEATURE_PHASE_173"],
   "phase-api-versioning": ["NEXT_PUBLIC_FEATURE_PHASE_API_VERSIONING", "FEATURE_PHASE_API_VERSIONING"],
   "phase-docs-playground": ["NEXT_PUBLIC_FEATURE_PHASE_DOCS_PLAYGROUND", "FEATURE_PHASE_DOCS_PLAYGROUND"],
 };
+
 
 function isTruthy(v: string | undefined): boolean {
   // Accept common deployment-system spellings while keeping unset values disabled.
@@ -319,9 +360,22 @@ export function getEnabledFeatureFlags(): PhaseFeatureFlag[] {
     "phase-159",
     "phase-160",
     "phase-161",
+    "phase-162",
+    "phase-163",
+    "phase-164",
+    "phase-165",
+    "phase-166",
+    "phase-167",
+    "phase-168",
+    "phase-169",
+    "phase-170",
+    "phase-171",
+    "phase-172",
+    "phase-173",
     "phase-api-versioning",
     "phase-docs-playground",
   ];
+
   // Filtering is evaluated at call time, allowing runtime test overrides.
   return all.filter(isFeatureEnabled)
 }

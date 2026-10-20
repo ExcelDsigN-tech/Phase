@@ -10,6 +10,7 @@ import {
   getModerationAuditEvents,
 } from "@/lib/moderation-audit"
 import { getLatestForTarget, isModerationTriageEnabled, resolveQueueItem } from "@/lib/moderation-triage"
+import { assertNoLegalHold, LegalHoldError } from "@/lib/legal-hold"
 
 /**
  * phase-146: a takedown/restore made here is a human decision about the same
@@ -56,7 +57,8 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 })
   }
   const { id } = await params
-  return NextResponse.json({ events: await getModerationAuditEvents(id) })
+  const events = await getModerationAuditEvents(id)
+  return NextResponse.json({ events })
 }
 
 /**
@@ -107,6 +109,19 @@ export async function POST(
   const existing = await getSignal(id)
   if (!existing) {
     return NextResponse.json({ error: "Signal not found" }, { status: 404 })
+  }
+
+  // phase-169: deny-delete preservation under active legal hold
+  try {
+    await assertNoLegalHold("signal", id, action, existing.author_wallet)
+  } catch (holdErr) {
+    if (holdErr instanceof LegalHoldError) {
+      return NextResponse.json(
+        { error: holdErr.message, code: holdErr.code, hold: holdErr.hold },
+        { status: 423 }, // HTTP 423 Locked
+      )
+    }
+    throw holdErr
   }
 
   try {
