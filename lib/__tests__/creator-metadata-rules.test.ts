@@ -19,7 +19,7 @@ const VECTORS = fs
     return { expect, max: Number(max), bytes: Uint8Array.from(Buffer.from(hex, "hex")), note }
   })
 
-describe("phase-165 parity with str_is_safe_for_json_fragment", () => {
+describe("phase-creator-cli parity with str_is_safe_for_json_fragment", () => {
   it("loads the shared vectors", () => {
     expect(VECTORS.length).toBeGreaterThanOrEqual(15)
   })
@@ -40,7 +40,7 @@ describe("phase-165 parity with str_is_safe_for_json_fragment", () => {
   })
 })
 
-describe("phase-165 collection draft validation", () => {
+describe("phase-creator-cli collection draft validation", () => {
   const draft = { name: "Genesis", price_stroops: "10000000", image_uri: "ipfs://bafybeigdyrzt" }
 
   it("accepts a clean draft", () => {

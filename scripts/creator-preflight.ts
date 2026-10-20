@@ -1,12 +1,12 @@
 /**
- * Spike 661 (phase-165): thin-wrapper preflight shared by the legacy scripts.
+ * Spike 661 (phase-creator-cli): thin-wrapper preflight shared by the legacy scripts.
  *
  * Each script calls `creatorPreflight()` right before its `main()`. The
  * script's own logic is untouched.
  *
  * - `--dry-run` (always honored): print what the script would do and exit 0
  *   before any network call, key generation or file write.
- * - FEATURE_PHASE_165=1: run `phase-creator env --json` first and stop with
+ * - FEATURE_PHASE_CREATOR_CLI=1: run `phase-creator env --json` first and stop with
  *   exit 3 if a required variable is missing or malformed. Values are never
  *   printed, only variable names and the kind of problem.
  * - Flag off and no `--dry-run`: returns immediately, so the script behaves
@@ -34,7 +34,7 @@ type Preflight = {
 }
 
 function flagOn(): boolean {
-  return ["NEXT_PUBLIC_FEATURE_PHASE_165", "FEATURE_PHASE_165"].some((k) =>
+  return ["NEXT_PUBLIC_FEATURE_PHASE_CREATOR_CLI", "FEATURE_PHASE_CREATOR_CLI"].some((k) =>
     ["1", "true", "yes", "on"].includes((process.env[k] ?? "").trim().toLowerCase()),
   )
 }
@@ -53,11 +53,11 @@ export function creatorPreflight({ script, plan, needs = [] }: Preflight): void 
     try {
       report = JSON.parse(res.stdout.trim().split("\n").pop() || "{}")
     } catch {
-      console.error(`[phase-165] ${script}: env check did not return JSON (exit ${res.status ?? "?"})`)
+      console.error(`[phase-creator-cli] ${script}: env check did not return JSON (exit ${res.status ?? "?"})`)
       process.exit(3)
     }
     if (!report.ok) {
-      console.error(`[phase-165] ${script}: env check failed`)
+      console.error(`[phase-creator-cli] ${script}: env check failed`)
       for (const c of report.checks ?? []) if (!c.ok) console.error(`  ${c.variable}: ${c.detail}`)
       process.exit(3)
     }

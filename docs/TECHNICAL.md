@@ -419,7 +419,7 @@ NEXT_PUBLIC_FEATURE_PHASE_158=1
 NEXT_PUBLIC_FEATURE_PHASE_159=1
 NEXT_PUBLIC_FEATURE_PHASE_160=1
 NEXT_PUBLIC_FEATURE_PHASE_161=1
-FEATURE_PHASE_165=1               # creator CLI side effects (server/CLI only)
+FEATURE_PHASE_CREATOR_CLI=1               # creator CLI side effects (server/CLI only)
 # Server-only aliases also accepted: FEATURE_PHASE_104, etc.
 ```
 
@@ -438,7 +438,7 @@ Rollback: unset the var or set `0` and restart. No ledger migration to revert; o
 
 | Flag | Scope | Rollback |
 |---|---|---|
-| `phase-165` | Creator CLI (spike 661): `npm run creator -- <scaffold\|validate\|env\|pin\|deploy\|run>`; exit 0 ok, 1 invalid, 2 usage, 3 env, 4 remote, 5 flag off. Rules in `lib/creator-metadata-rules.ts`, parity vectors in `contracts/phase-protocol/test-vectors/json-fragment.tsv` | Unset. Side-effecting commands exit 5, read-only ones keep working |
+| `phase-creator-cli` | Creator CLI (spike 661): `npm run creator -- <scaffold\|validate\|env\|pin\|deploy\|run>`; exit 0 ok, 1 invalid, 2 usage, 3 env, 4 remote, 5 flag off. Rules in `lib/creator-metadata-rules.ts`, parity vectors in `contracts/phase-protocol/test-vectors/json-fragment.tsv` | Unset. Side-effecting commands exit 5, read-only ones keep working |
 
 ---
 

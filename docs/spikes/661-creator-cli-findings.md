@@ -14,13 +14,13 @@ Deploying is a manual, multi-step shell process. Fifteen one-off scripts share n
 
 The issue asks for ASCII rejection, but the contract doesn't reject non-ASCII, so a validator that did would block names the chain accepts. The validator mirrors the contract and reports non-ASCII as a warning.
 
-## Delivered in this PR (phase-165)
+## Delivered in this PR (phase-creator-cli)
 
 1. **One command tree** (`lib/creator-cli.ts`, entry `scripts/phase-creator.cts`, `bin: phase-creator`, `npm run creator --`): `scaffold`, `validate`, `env` (the diagnose command), `pin`, `deploy`, `run`. Global `--json`, `--dry-run`, `--network` (only `testnet`). Exit codes: 0 ok, 1 invalid input, 2 usage, 3 env missing, 4 remote failure, 5 flag off.
 2. **Offline validation with Rust parity** (`lib/creator-metadata-rules.ts`): a byte-exact port of `str_is_safe_for_json_fragment` plus the price rule. Issues are tagged `chain` (would revert, with the PhaseError number), `app` or `warn`. Shared vectors in `contracts/phase-protocol/test-vectors/json-fragment.tsv` run in vitest and in `src/test.rs`.
 3. **Headless pin**: `pin <file>` uses the shared `resolvePinataJwt` (the API route uses it too) and `pinFileToIpfsWithRetry` with checksum verification. The JWT and any Stellar seed are scrubbed from every message.
 4. **Reusable env diagnostics** (`lib/env-validation.ts:diagnoseCreatorEnv`): presence and format per capability, a testnet passphrase check, and detection of a secret seed in a `NEXT_PUBLIC_*` var. It never returns a value. `diagnose-env.ts` shows the same section when the flag is on.
-5. **Thin wrappers**: every listed script now calls `creatorPreflight()` (`scripts/creator-preflight.ts`) right before its `main()`. `--dry-run` prints that script's plan and exits 0 before any network call, key generation or file write. With `FEATURE_PHASE_165=1`, the script first runs `phase-creator env --json` and stops with exit 3 on a missing or malformed variable. With the flag off and no `--dry-run`, the preflight returns immediately and the script runs exactly as before. Each script's own logic is untouched.
+5. **Thin wrappers**: every listed script now calls `creatorPreflight()` (`scripts/creator-preflight.ts`) right before its `main()`. `--dry-run` prints that script's plan and exits 0 before any network call, key generation or file write. With `FEATURE_PHASE_CREATOR_CLI=1`, the script first runs `phase-creator env --json` and stops with exit 3 on a missing or malformed variable. With the flag off and no `--dry-run`, the preflight returns immediately and the script runs exactly as before. Each script's own logic is untouched.
 
 ## Spike questions (from the issue)
 
@@ -28,7 +28,7 @@ The issue asks for ASCII rejection, but the contract doesn't reject non-ASCII, s
 2. **Replay and idempotency per write.** `validate` and `env` don't write. `pin` is content-addressed: pinning the same bytes twice returns the same CID, and the sha256 check catches corrupted retries. `deploy` is **not** idempotent, because each run deploys a new contract instance and rewrites `.env.local`. The CLI doesn't resume a half-finished deploy. That's the "resumable pin-then-deploy" ask, and it's listed under follow-up. A double submit after a timeout in `create_collection` creates two collections, since the contract has no dedupe key; the CLI doesn't call `create_collection` itself.
 3. **Contract-ID drift, issuer rotation, gateway failover.** `env --needs deploy` checks that `NEXT_PUBLIC_PHASER_TOKEN_ID` is a valid `C…` and the treasury a valid `G…`, but it can't tell whether they point at the deployment you meant. Drift between `.env.local` and the deployed instance isn't detected (follow-up). Pinning goes through Pinata only; the multi-gateway paths (phase-117/123) are read-side and not used by `pin`.
 4. **409/429/412 taxonomy.** The CLI maps outcomes to exit codes instead: Pinata 429/5xx is retried with backoff inside `pinFileToIpfsWithRetry`, then becomes exit 4 with the error code. No CLI command does an ETag/If-Match write. No input is lost because every command is file-based and nothing is overwritten (`scaffold` refuses an existing file).
-5. **Migration and rollback.** No WASM change and no schema change. Rollback is unsetting `FEATURE_PHASE_165`: side-effecting CLI commands exit 5, the preflight goes back to a no-op, read-only commands keep working, and nothing is persisted. A deploy made through the CLI is the same as one made by the old script, so the existing "new instance, old NFTs stay on the old contract" story applies.
+5. **Migration and rollback.** No WASM change and no schema change. Rollback is unsetting `FEATURE_PHASE_CREATOR_CLI`: side-effecting CLI commands exit 5, the preflight goes back to a no-op, read-only commands keep working, and nothing is persisted. A deploy made through the CLI is the same as one made by the old script, so the existing "new instance, old NFTs stay on the old contract" story applies.
 
 ## Acceptance criteria status
 
@@ -45,7 +45,7 @@ The issue asks for ASCII rejection, but the contract doesn't reject non-ASCII, s
 
 Prereqs: `stellar` CLI on PATH, a funded testnet admin account, a Pinata JWT, and the optimized WASM built (`cd contracts/phase-protocol && cargo build --target wasm32-unknown-unknown --release && stellar contract optimize ...`).
 
-1. Put these in `.env.local` (never commit it): `FEATURE_PHASE_165=1`, `PINATA_JWT`, `ADMIN_SECRET_KEY`, `NEXT_PUBLIC_PHASER_TOKEN_ID`, `NEXT_PUBLIC_CLASSIC_LIQ_ISSUER`, `STELLAR_NETWORK_PASSPHRASE=Test SDF Network ; September 2015`.
+1. Put these in `.env.local` (never commit it): `FEATURE_PHASE_CREATOR_CLI=1`, `PINATA_JWT`, `ADMIN_SECRET_KEY`, `NEXT_PUBLIC_PHASER_TOKEN_ID`, `NEXT_PUBLIC_CLASSIC_LIQ_ISSUER`, `STELLAR_NETWORK_PASSPHRASE=Test SDF Network ; September 2015`.
 2. `npm run creator -- env --needs pin,deploy` should exit 0 with every check `ok`.
 3. `npm run creator -- scaffold ./my-drop`, fill in `name` and `image_uri`, then `npm run creator -- validate ./my-drop/collection.json`. Then try a name with a `"` and confirm exit 1 with `PhaseError #10`.
 4. Dry run: `npm run proof:661 -- --asset ./my-drop/cover.png --collection ./my-drop/collection.json`.

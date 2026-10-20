@@ -40,7 +40,7 @@ function makeDeps(over: Partial<CliDeps> & { files?: Record<string, string> } = 
 
 const json = (lines: string[]) => JSON.parse(lines[lines.length - 1])
 
-describe("phase-165 argument parsing", () => {
+describe("phase-creator-cli argument parsing", () => {
   it("parses globals and passthrough args", () => {
     expect(parseCliArgs(["run", "interact", "--json", "--dry-run", "--", "--foo"])).toMatchObject({
       command: "run",
@@ -59,7 +59,7 @@ describe("phase-165 argument parsing", () => {
   })
 })
 
-describe("phase-165 exit codes", () => {
+describe("phase-creator-cli exit codes", () => {
   it("usage errors exit 2, non-testnet networks exit 2", async () => {
     expect(await runCreatorCli(["bogus"], makeDeps().deps)).toBe(EXIT.usage)
     const { deps, out } = makeDeps()
@@ -67,7 +67,7 @@ describe("phase-165 exit codes", () => {
     expect(json(out)).toEqual({ ok: false, error: "network_not_supported", network: "mainnet" })
   })
 
-  it("side effects need phase-165; dry runs and read-only commands do not", async () => {
+  it("side effects need phase-creator-cli; dry runs and read-only commands do not", async () => {
     const files = { "a.png": "png" }
     expect(await runCreatorCli(["pin", "a.png"], makeDeps({ files }).deps)).toBe(EXIT.disabled)
     expect(await runCreatorCli(["deploy"], makeDeps().deps)).toBe(EXIT.disabled)
@@ -78,8 +78,8 @@ describe("phase-165 exit codes", () => {
   })
 })
 
-describe("phase-165 commands", () => {
-  const on = { FEATURE_PHASE_165: "1" }
+describe("phase-creator-cli commands", () => {
+  const on = { FEATURE_PHASE_CREATOR_CLI: "1" }
 
   it("scaffold writes a template that validate accepts once named, and never overwrites", async () => {
     const { deps, files } = makeDeps({ env: on })
@@ -158,7 +158,7 @@ describe("phase-165 commands", () => {
   })
 })
 
-describe("phase-165 shared helpers", () => {
+describe("phase-creator-cli shared helpers", () => {
   it("one JWT lookup order for the route and the CLI", () => {
     expect(resolvePinataJwt({ PINATA_JWT: " a ", PINATA_API_JWT: "b" })).toBe("a")
     expect(resolvePinataJwt({ PINATA_API_JWT: "b" })).toBe("b")

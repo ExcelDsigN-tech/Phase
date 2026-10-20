@@ -52,7 +52,7 @@
  * - phase-161: typed contract-error taxonomy — code-stable PhaseError
  *   descriptors with retryable hints and message keys (partial slice of spike
  *   660 / issue #523)
- * - phase-165: creator CLI JSON output and offline metadata validation parity
+ * - phase-creator-cli: creator CLI JSON output and offline metadata validation parity
  *   (spike 661 / issue #524)
  */
 
@@ -130,7 +130,7 @@ export type PhaseFeatureFlag =
   | "phase-159"
   | "phase-160"
   | "phase-161"
-  | "phase-165";
+  | "phase-creator-cli";
 
 const FLAG_ENV_MAP: Record<PhaseFeatureFlag, string[]> = {
   "phase-66": ["NEXT_PUBLIC_FEATURE_PHASE_66", "FEATURE_PHASE_66"],
@@ -206,7 +206,7 @@ const FLAG_ENV_MAP: Record<PhaseFeatureFlag, string[]> = {
   "phase-159": ["NEXT_PUBLIC_FEATURE_PHASE_159", "FEATURE_PHASE_159"],
   "phase-160": ["NEXT_PUBLIC_FEATURE_PHASE_160", "FEATURE_PHASE_160"],
   "phase-161": ["NEXT_PUBLIC_FEATURE_PHASE_161", "FEATURE_PHASE_161"],
-  "phase-165": ["NEXT_PUBLIC_FEATURE_PHASE_165", "FEATURE_PHASE_165"],
+  "phase-creator-cli": ["NEXT_PUBLIC_FEATURE_PHASE_CREATOR_CLI", "FEATURE_PHASE_CREATOR_CLI"],
 };
 
 function isTruthy(v: string | undefined): boolean {
@@ -315,7 +315,7 @@ export function getEnabledFeatureFlags(): PhaseFeatureFlag[] {
     "phase-159",
     "phase-160",
     "phase-161",
-    "phase-165",
+    "phase-creator-cli",
   ];
   // Filtering is evaluated at call time, allowing runtime test overrides.
   return all.filter(isFeatureEnabled)
