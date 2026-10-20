@@ -13,9 +13,9 @@ const RECIPES_ENABLED = ["1", "true", "yes", "on"].includes(
   (process.env.NEXT_PUBLIC_FEATURE_PHASE_668 ?? "").trim().toLowerCase(),
 )
 
-// phase-162 try-it-live console, read literally for the same reason.
+// phase-docs-playground try-it-live console, read literally for the same reason.
 const PLAYGROUND_ENABLED = ["1", "true", "yes", "on"].includes(
-  (process.env.NEXT_PUBLIC_FEATURE_PHASE_162 ?? "").trim().toLowerCase(),
+  (process.env.NEXT_PUBLIC_FEATURE_PHASE_DOCS_PLAYGROUND ?? "").trim().toLowerCase(),
 )
 
 /** Renders text with every occurrence of "wallet" highlighted in cyan. */

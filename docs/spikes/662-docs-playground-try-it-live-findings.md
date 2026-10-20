@@ -13,7 +13,7 @@
 - Only `POST /api/signals` verifies a wallet signature (SEP-53). `POST /api/classic-liq/trustline` takes a client-signed XDR. `market` and `nft-listings` writes check no signature.
 - None of the listed routes echo a correlation ID; only routes using `createApiRequestContext` do.
 
-## Delivered in this PR (phase-162)
+## Delivered in this PR (phase-docs-playground)
 
 1. **Route manifest and typed request builder**: the console reads the same contract as spike 663 (`lib/api-contract.ts`), and `lib/api-playground.ts:buildPlaygroundRequest` builds from it. Path params are required and encoded, query params are limited to the declared ones, bodies must be JSON objects with only declared fields, and JSON-RPC needs `jsonrpc: "2.0"` plus a method. URLs are relative and same-origin only.
 2. **Response inspector** (`interpretPlaygroundResponse`): status plus a classified kind (`ok`, `jsonrpc_error`, `x402_shim_disabled`, `rate_limited`, `unavailable`, `version_rejected`, `http_error`), the JSON-RPC code and message from inside a 200, `Retry-After` as seconds or HTTP-date, the version echo, and secret redaction before display.
@@ -29,7 +29,7 @@
 2. **Replay and idempotency per write.** The console adds no write path of its own; every call goes to the existing handler. Signal signatures bind `title`, `body` and a fresh `timestamp`, and the server rejects a stale timestamp. Faucet double submits are handled by `faucetPending` as before. A retry after a timeout sends a **new** correlation ID and a new timestamp, so it's a new request, not a replay.
 3. **Contract-ID drift, issuer rotation, gateway failover.** The fence compares the build's network passphrase and the wallet's against testnet. It doesn't verify contract IDs (the handlers do). Gateway and RPC failover stay in `/api/soroban-rpc`; the console shows the resulting envelope, including the `-32603` outage case.
 4. **409/429/412 taxonomy and recovery without losing input.** 429 → `rate_limited`, with the `Retry-After` countdown and input kept. 503 → `unavailable`, or `x402_shim_disabled` for the shim. 406/410 → `version_rejected`. Any other 4xx/5xx, including 409 and 412 → `http_error`, with the body shown and input kept. `ETag`/`If-Match` routes (signal edits) aren't in this issue's route list, so the console doesn't send `If-Match` yet (follow-up).
-5. **Migration and rollback.** No WASM, schema or sidecar change. Rollback: unset `NEXT_PUBLIC_FEATURE_PHASE_162`, rebuild and redeploy. The section disappears and nothing is persisted.
+5. **Migration and rollback.** No WASM, schema or sidecar change. Rollback: unset `NEXT_PUBLIC_FEATURE_PHASE_DOCS_PLAYGROUND`, rebuild and redeploy. The section disappears and nothing is persisted.
 
 ## Acceptance criteria status
 
@@ -49,7 +49,7 @@
 
 ## Lab results (production build, cloud container)
 
-`next build` with `NEXT_PUBLIC_FEATURE_PHASE_162=1`, `next start` with `FEATURE_PHASE_163=1`, run on 2026-10-18. `npm run proof:662 -- --burst 40` passed 5/5:
+`next build` with `NEXT_PUBLIC_FEATURE_PHASE_DOCS_PLAYGROUND=1`, `next start` with `FEATURE_PHASE_API_VERSIONING=1`, run on 2026-10-18. `npm run proof:662 -- --burst 40` passed 5/5:
 
 - the console section is rendered on `/docs`;
 - the proxy's JSON-RPC error inside HTTP 200 is classified as `jsonrpc_error` (this container can't reach Soroban testnet, so it was the proxy's own `-32603` failover envelope);
@@ -61,7 +61,7 @@ Signing and faucet steps need testnet and a wallet; see the checklist.
 
 ## Live proof checklist (run by the maintainer)
 
-1. Deploy this branch with `NEXT_PUBLIC_FEATURE_PHASE_162=1` (build-time) and `FEATURE_PHASE_163=1`, pointed at testnet.
+1. Deploy this branch with `NEXT_PUBLIC_FEATURE_PHASE_DOCS_PLAYGROUND=1` (build-time) and `FEATURE_PHASE_API_VERSIONING=1`, pointed at testnet.
 2. `npm run proof:662 -- --base-url https://<preview-host> --burst 40` and confirm every line says PASS.
 3. In a browser with Freighter on **testnet**:
    - pick `faucet.claim`, send with your wallet address, and note the result;

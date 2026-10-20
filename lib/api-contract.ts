@@ -1,12 +1,12 @@
 /**
- * Spike 663 (phase-163): source of truth for the public API contract.
+ * Spike 663 (phase-api-versioning): source of truth for the public API contract.
  *
  * Status codes and fields were read off each route handler at spike time; they
  * describe what the code returns, not an aspiration. `scripts/api-contract.cts`
  * renders this into `docs/api/openapi.json` and fails CI when a change would
  * break an existing client without a version bump (see `lib/api-versioning.ts`).
  *
- * Spike 662 (phase-162) reuses the same list to drive the docs playground, so
+ * Spike 662 (phase-docs-playground) reuses the same list to drive the docs playground, so
  * `stateChanging` and `signing` are also the playground's safety fences.
  */
 
@@ -325,7 +325,7 @@ export const API_OPERATIONS: readonly ApiOperation[] = [
     id: "versions.get",
     method: "GET",
     path: "/api/versions",
-    summary: "Supported versions, deprecations, changelog, or the OpenAPI document (?format=openapi). 404 unless phase-163 is on",
+    summary: "Supported versions, deprecations, changelog, or the OpenAPI document (?format=openapi). 404 unless phase-api-versioning is on",
     tag: "meta",
     query: ["format"],
     statuses: [200, 400, 404],

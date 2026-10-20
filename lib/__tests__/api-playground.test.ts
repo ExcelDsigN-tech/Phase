@@ -21,7 +21,7 @@ const headers = (h: Record<string, string> = {}) => new Headers(h)
 const MAINNET = "Public Global Stellar Network ; September 2015"
 const ADDR = "GABC"
 
-describe("phase-162 request builder", () => {
+describe("phase-docs-playground request builder", () => {
   it("covers every contract operation and marks the unsendable ones docs-only", () => {
     expect(ops).toHaveLength(API_OPERATIONS.length)
     expect(op("ipfs.pin").mode).toBe("docs_only")
@@ -71,7 +71,7 @@ describe("phase-162 request builder", () => {
   })
 })
 
-describe("phase-162 testnet fence", () => {
+describe("phase-docs-playground testnet fence", () => {
   const env = { appPassphrase: TESTNET_PASSPHRASE, walletAddress: null, walletPassphrase: null }
 
   it("reads are always allowed, writes only on a testnet build", () => {
@@ -99,7 +99,7 @@ describe("phase-162 testnet fence", () => {
   })
 })
 
-describe("phase-162 response viewer", () => {
+describe("phase-docs-playground response viewer", () => {
   it("treats a JSON-RPC error inside HTTP 200 as an error", () => {
     const r = interpretPlaygroundResponse(
       {
@@ -159,7 +159,7 @@ describe("phase-162 response viewer", () => {
   })
 })
 
-describe("phase-162 docs wiring", () => {
+describe("phase-docs-playground docs wiring", () => {
   it("has EN and ES copy with the same keys", () => {
     const keys = (o: object): string[] =>
       Object.entries(o).flatMap(([k, v]) => (v && typeof v === "object" ? keys(v).map((c) => `${k}.${c}`) : [k]))

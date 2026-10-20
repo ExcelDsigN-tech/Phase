@@ -10,10 +10,10 @@ import {
 
 export const dynamic = "force-dynamic"
 
-/** phase-163: machine-readable versions, deprecations, changelog and OpenAPI contract. */
+/** phase-api-versioning: machine-readable versions, deprecations, changelog and OpenAPI contract. */
 export async function GET(request: NextRequest) {
-  if (!isFeatureEnabled("phase-163")) {
-    return NextResponse.json({ error: "Feature phase-163 disabled" }, { status: 404 })
+  if (!isFeatureEnabled("phase-api-versioning")) {
+    return NextResponse.json({ error: "Feature phase-api-versioning disabled" }, { status: 404 })
   }
   const format = request.nextUrl.searchParams.get("format")
   if (format === "openapi") {

@@ -12,7 +12,7 @@ The public API has no version prefix, no `Accept-Version` / `X-API-Version` head
 - `lib/api-observability.ts:createApiRequestContext` existed, but no listed route used it.
 - Several `/api` routes set `Vary: Authorization` (gated metadata, IPFS, OG) so shared caches can't leak gated responses.
 
-## Delivered in this PR (phase-163)
+## Delivered in this PR (phase-api-versioning)
 
 1. **Contract source** (`lib/api-contract.ts`): one typed entry per operation (24, across 15 paths) with params, body fields, the status codes each handler returns (read per handler), `stateChanging` and `signing`.
 2. **Negotiation** (`lib/api-versioning.ts`, wired in `middleware.ts` for `/api/*`, preflights excluded). `X-API-Version` pins an exact id and wins over `Accept-Version`, which takes the first supported id from a list. No header means the current version. Unknown or malformed gives `406 UNSUPPORTED_API_VERSION` with the supported list. Past its sunset gives `410 API_VERSION_SUNSET`.
@@ -44,7 +44,7 @@ The public API has no version prefix, no `Accept-Version` / `X-API-Version` head
 
 `next build && next start` of `feat/docs-api-playground` (which contains this branch), run on 2026-10-18.
 
-- **Flag on (`FEATURE_PHASE_163=1`):** `npm run proof:663` passed 15/15. `/api/versions` returned 200 with current `2026-10-17`, the OpenAPI document has 15 paths, all ten listed routes echo `X-API-Version` with the full `Vary` superset, `X-API-Version` pinning and `Accept-Version` lists work, and `1999-01-01` gets a typed `406 UNSUPPORTED_API_VERSION`.
+- **Flag on (`FEATURE_PHASE_API_VERSIONING=1`):** `npm run proof:663` passed 15/15. `/api/versions` returned 200 with current `2026-10-17`, the OpenAPI document has 15 paths, all ten listed routes echo `X-API-Version` with the full `Vary` superset, `X-API-Version` pinning and `Accept-Version` lists work, and `1999-01-01` gets a typed `406 UNSUPPORTED_API_VERSION`.
 - **Gated cache key kept:** `/api/metadata/1` responds with `Vary: Accept-Version, X-API-Version, Authorization, Accept-Language, X-Phase-Lang`.
 - **Flag off:** the proof reports `/api/versions` → 404 as expected. `GET /api/market` with `X-API-Version: nope` returns 200 with no `X-API-Version` header, which is the pre-spike behavior.
 
@@ -52,10 +52,10 @@ A deployed preview run (checklist below) still confirms the same on Vercel's edg
 
 ## Live proof checklist (run by the maintainer)
 
-1. Deploy this branch to a preview with `FEATURE_PHASE_163=1` (no other env needed for this proof).
+1. Deploy this branch to a preview with `FEATURE_PHASE_API_VERSIONING=1` (no other env needed for this proof).
 2. `npm run proof:663 -- --base-url https://<preview-host>`. Every line should say PASS, and the run writes `.data/proofs/663-*.json`.
 3. Check gated caching on a real token: `curl -sI "https://<preview-host>/api/metadata/<TOKEN_ID>?c=<CONTRACT_ID>"` must still include `Authorization` in `Vary` and the route's CORS headers. Take `TOKEN_ID` and `CONTRACT_ID` from your deployment's env, not from code.
-4. Unset `FEATURE_PHASE_163`, redeploy, and rerun step 2. The first check should fail with "returned 404", and no `X-API-Version` header should appear.
+4. Unset `FEATURE_PHASE_API_VERSIONING`, redeploy, and rerun step 2. The first check should fail with "returned 404", and no `X-API-Version` header should appear.
 5. Fill in:
 
 | Item | Value |

@@ -52,9 +52,9 @@
  * - phase-161: typed contract-error taxonomy — code-stable PhaseError
  *   descriptors with retryable hints and message keys (partial slice of spike
  *   660 / issue #523)
- * - phase-163: API version negotiation, deprecation headers and OpenAPI
+ * - phase-api-versioning: API version negotiation, deprecation headers and OpenAPI
  *   contract (spike 663 / issue #526)
- * - phase-162: interactive docs playground / try-it-live API console
+ * - phase-docs-playground: interactive docs playground / try-it-live API console
  *   (spike 662 / issue #525)
  */
 
@@ -132,8 +132,8 @@ export type PhaseFeatureFlag =
   | "phase-159"
   | "phase-160"
   | "phase-161"
-  | "phase-163"
-  | "phase-162";
+  | "phase-api-versioning"
+  | "phase-docs-playground";
 
 const FLAG_ENV_MAP: Record<PhaseFeatureFlag, string[]> = {
   "phase-66": ["NEXT_PUBLIC_FEATURE_PHASE_66", "FEATURE_PHASE_66"],
@@ -209,8 +209,8 @@ const FLAG_ENV_MAP: Record<PhaseFeatureFlag, string[]> = {
   "phase-159": ["NEXT_PUBLIC_FEATURE_PHASE_159", "FEATURE_PHASE_159"],
   "phase-160": ["NEXT_PUBLIC_FEATURE_PHASE_160", "FEATURE_PHASE_160"],
   "phase-161": ["NEXT_PUBLIC_FEATURE_PHASE_161", "FEATURE_PHASE_161"],
-  "phase-163": ["NEXT_PUBLIC_FEATURE_PHASE_163", "FEATURE_PHASE_163"],
-  "phase-162": ["NEXT_PUBLIC_FEATURE_PHASE_162", "FEATURE_PHASE_162"],
+  "phase-api-versioning": ["NEXT_PUBLIC_FEATURE_PHASE_API_VERSIONING", "FEATURE_PHASE_API_VERSIONING"],
+  "phase-docs-playground": ["NEXT_PUBLIC_FEATURE_PHASE_DOCS_PLAYGROUND", "FEATURE_PHASE_DOCS_PLAYGROUND"],
 };
 
 function isTruthy(v: string | undefined): boolean {
@@ -319,8 +319,8 @@ export function getEnabledFeatureFlags(): PhaseFeatureFlag[] {
     "phase-159",
     "phase-160",
     "phase-161",
-    "phase-163",
-    "phase-162",
+    "phase-api-versioning",
+    "phase-docs-playground",
   ];
   // Filtering is evaluated at call time, allowing runtime test overrides.
   return all.filter(isFeatureEnabled)

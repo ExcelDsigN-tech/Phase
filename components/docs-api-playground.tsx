@@ -51,7 +51,7 @@ async function signBody(op: PlaygroundOperation, body: string, address: string):
   return JSON.stringify({ ...parsed, wallet: address, timestamp, signature })
 }
 
-/** phase-162: try-it-live console for the documented API surface. */
+/** phase-docs-playground: try-it-live console for the documented API surface. */
 export function DocsApiPlayground() {
   const { lang } = useLang()
   const copy = pickCopy(lang)

@@ -1,5 +1,5 @@
 /**
- * Spike 663 (phase-163): API version negotiation, deprecation signalling and
+ * Spike 663 (phase-api-versioning): API version negotiation, deprecation signalling and
  * the machine-readable contract.
  *
  * Pure module (no Next imports) so the edge middleware, route handlers, tests
@@ -254,7 +254,7 @@ export function buildOpenApiDocument(
       ...versionHeaderParams(),
     ]
     const responseHeaders: JsonObject = {
-      [API_VERSION_HEADER]: { schema: { type: "string" }, description: "Negotiated version (phase-163)" },
+      [API_VERSION_HEADER]: { schema: { type: "string" }, description: "Negotiated version (phase-api-versioning)" },
     }
     for (const h of op.responseHeaders ?? []) responseHeaders[h] = { schema: { type: "string" } }
 
@@ -262,7 +262,7 @@ export function buildOpenApiDocument(
     for (const status of [...op.statuses].sort((a, b) => a - b)) {
       responses[String(status)] = { description: `HTTP ${status}`, headers: responseHeaders }
     }
-    responses["406"] ??= { description: "Unsupported API version (phase-163)" }
+    responses["406"] ??= { description: "Unsupported API version (phase-api-versioning)" }
 
     const operation: JsonObject = {
       operationId: op.id,

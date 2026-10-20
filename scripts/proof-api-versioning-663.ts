@@ -1,10 +1,10 @@
 /**
- * Spike 663 (phase-163) live proof: API version negotiation and headers.
+ * Spike 663 (phase-api-versioning) live proof: API version negotiation and headers.
  *
  *   npm run proof:663 -- --base-url https://<preview-or-localhost>
  *
  * Read-only: only GET requests, so it is safe against any deployment. Run it
- * with FEATURE_PHASE_163=1 set on the server (it reports clearly when the flag
+ * with FEATURE_PHASE_API_VERSIONING=1 set on the server (it reports clearly when the flag
  * is off). Results go to .data/proofs/663-<timestamp>.json; exit 1 if any check fails.
  */
 
@@ -52,7 +52,7 @@ async function get(p: string, headers: Record<string, string> = {}) {
 async function main() {
   const versions = await get("/api/versions")
   if (versions.status === 404) {
-    check("phase-163 enabled on server", false, "GET /api/versions returned 404; set FEATURE_PHASE_163=1 and restart")
+    check("phase-api-versioning enabled on server", false, "GET /api/versions returned 404; set FEATURE_PHASE_API_VERSIONING=1 and restart")
     return finish()
   }
   const current = (versions.json as { current?: string } | null)?.current ?? ""

@@ -16,7 +16,7 @@ export type DocsBlock =
   | { type: "code"; text: string; label?: string }
   | { type: "image"; src: string; alt: string; label?: string }
   | { type: "recipe"; recipe: DocsRecipe }
-  /** phase-162: the try-it-live console; the page renders the component. */
+  /** phase-docs-playground: the try-it-live console; the page renders the component. */
   | { type: "playground"; intro: string }
 
 export type IntegrationRecipeId =

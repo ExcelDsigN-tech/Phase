@@ -1,5 +1,5 @@
 /**
- * Spike 662 (phase-162): pure logic behind the docs "try it live" console.
+ * Spike 662 (phase-docs-playground): pure logic behind the docs "try it live" console.
  *
  * The UI (`components/docs-api-playground.tsx`) stays thin: this module builds
  * typed requests from the shared contract (`lib/api-contract.ts`), fences

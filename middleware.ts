@@ -34,14 +34,14 @@ function buildCSP(): string {
 }
 
 /**
- * phase-163: negotiate the API version for /api/* (preflights excluded, they
+ * phase-api-versioning: negotiate the API version for /api/* (preflights excluded, they
  * cannot carry the header value). Unsupported versions stop here with a typed
  * 406/410; negotiated ones are forwarded to the handler and echoed back.
  */
 function apiVersionResponse(request: NextRequest): NextResponse | null {
   const { pathname } = request.nextUrl
   if (!pathname.startsWith("/api/") || request.method === "OPTIONS") return null
-  if (!isFeatureEnabled("phase-163")) return null
+  if (!isFeatureEnabled("phase-api-versioning")) return null
 
   const negotiated = negotiateApiVersion(request.headers)
   if (!negotiated.ok) {

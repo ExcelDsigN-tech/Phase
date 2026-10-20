@@ -1,5 +1,5 @@
 /**
- * Spike 662 (phase-162) live proof: the docs console's request builder and
+ * Spike 662 (phase-docs-playground) live proof: the docs console's request builder and
  * response classifier, run against a real deployment.
  *
  *   npm run proof:662 -- --base-url https://<preview-host> [--burst 70]
@@ -49,7 +49,7 @@ async function call(method: "GET" | "POST", p: string, input: Partial<Playground
 async function main() {
   const docs = await fetch(`${BASE}/docs`)
   const html = await docs.text()
-  record({ name: "console section on /docs", ok: html.includes('id="playground"'), detail: `status ${docs.status}; needs NEXT_PUBLIC_FEATURE_PHASE_162 at build time` })
+  record({ name: "console section on /docs", ok: html.includes('id="playground"'), detail: `status ${docs.status}; needs NEXT_PUBLIC_FEATURE_PHASE_DOCS_PLAYGROUND at build time` })
 
   const rpcErr = await call("POST", "/api/soroban-rpc", { body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "phaseProofUnknownMethod" }) })
   record({

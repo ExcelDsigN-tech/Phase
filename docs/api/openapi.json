@@ -54,7 +54,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -65,12 +65,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "412": {
             "description": "HTTP 412",
@@ -79,7 +79,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -90,7 +90,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           }
@@ -131,7 +131,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -147,7 +147,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -163,7 +163,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -179,7 +179,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -195,7 +195,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -205,7 +205,7 @@
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "409": {
             "description": "HTTP 409",
@@ -214,7 +214,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -230,7 +230,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -246,7 +246,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -262,7 +262,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -278,7 +278,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -294,7 +294,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -360,7 +360,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -371,7 +371,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -382,7 +382,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -393,7 +393,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -404,12 +404,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "409": {
             "description": "HTTP 409",
@@ -418,7 +418,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -429,7 +429,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -440,7 +440,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -451,7 +451,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -462,7 +462,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -473,7 +473,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           }
@@ -531,12 +531,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           }
         },
         "x-state-changing": false,
@@ -575,7 +575,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -591,7 +591,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -601,7 +601,7 @@
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "413": {
             "description": "HTTP 413",
@@ -610,7 +610,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -626,7 +626,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -642,7 +642,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               },
               "Retry-After": {
                 "schema": {
@@ -714,7 +714,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -725,12 +725,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "502": {
             "description": "HTTP 502",
@@ -739,7 +739,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -750,7 +750,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           }
@@ -791,7 +791,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -802,12 +802,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "409": {
             "description": "HTTP 409",
@@ -816,7 +816,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -827,7 +827,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -838,7 +838,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -849,7 +849,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           }
@@ -922,7 +922,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -933,12 +933,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "500": {
             "description": "HTTP 500",
@@ -947,7 +947,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           }
@@ -988,7 +988,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -999,12 +999,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "409": {
             "description": "HTTP 409",
@@ -1013,7 +1013,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1024,7 +1024,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1035,7 +1035,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           }
@@ -1108,12 +1108,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           }
         },
         "x-state-changing": false,
@@ -1152,7 +1152,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1163,7 +1163,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1174,12 +1174,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "413": {
             "description": "HTTP 413",
@@ -1188,7 +1188,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           }
@@ -1288,12 +1288,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           }
         },
         "x-state-changing": false,
@@ -1332,7 +1332,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1343,12 +1343,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           }
         },
         "x-state-changing": true,
@@ -1413,12 +1413,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           }
         },
         "x-state-changing": false,
@@ -1457,7 +1457,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1468,7 +1468,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1479,12 +1479,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           }
         },
         "x-state-changing": true,
@@ -1559,7 +1559,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1570,7 +1570,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1581,12 +1581,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "503": {
             "description": "HTTP 503",
@@ -1595,7 +1595,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           }
@@ -1636,7 +1636,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1647,7 +1647,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1658,12 +1658,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "503": {
             "description": "HTTP 503",
@@ -1672,7 +1672,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           }
@@ -1729,7 +1729,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1740,12 +1740,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "409": {
             "description": "HTTP 409",
@@ -1754,7 +1754,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1765,7 +1765,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           }
@@ -1821,12 +1821,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           }
         },
         "x-state-changing": false,
@@ -1867,12 +1867,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           }
         },
         "x-state-changing": false,
@@ -1927,7 +1927,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1938,12 +1938,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "502": {
             "description": "HTTP 502",
@@ -1952,7 +1952,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -1963,7 +1963,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           }
@@ -2043,7 +2043,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -2054,7 +2054,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -2065,12 +2065,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "502": {
             "description": "HTTP 502",
@@ -2079,7 +2079,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           }
@@ -2128,12 +2128,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           }
         },
         "x-state-changing": false,
@@ -2143,7 +2143,7 @@
     "/api/versions": {
       "get": {
         "operationId": "versions.get",
-        "summary": "Supported versions, deprecations, changelog, or the OpenAPI document (?format=openapi). 404 unless phase-163 is on",
+        "summary": "Supported versions, deprecations, changelog, or the OpenAPI document (?format=openapi). 404 unless phase-api-versioning is on",
         "tags": [
           "meta"
         ],
@@ -2182,7 +2182,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -2193,7 +2193,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -2204,12 +2204,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           }
         },
         "x-state-changing": false,
@@ -2258,7 +2258,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
@@ -2269,12 +2269,12 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           },
           "406": {
-            "description": "Unsupported API version (phase-163)"
+            "description": "Unsupported API version (phase-api-versioning)"
           },
           "500": {
             "description": "HTTP 500",
@@ -2283,7 +2283,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "Negotiated version (phase-163)"
+                "description": "Negotiated version (phase-api-versioning)"
               }
             }
           }

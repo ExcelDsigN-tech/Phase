@@ -187,7 +187,7 @@ settlement verifier and must not accept unsigned base64 payloads.
 | `phase-143` | `GET/POST /api/notifications/winback` | AI-driven churn and winback: dormancy tier classification, tailored return hooks, randomized experiment cohorts, and 7-day fatigue caps | `404` disabled |
 | `phase-144` | `GET/POST /api/governance/ve-lock` | ve-PHASELQ time-locked governance escrow: decaying lock weight (`1-208` weeks), pro-rata treasury fee-share distribution, and claims | `404` disabled |
 | `phase-145` | `GET/POST /api/governance/gauge` | Gauge voting for emissions: ve-weight-proportional votes directing weekly quest budget allocations across collections | `404` disabled |
-| `phase-163` | `/api/*` (middleware), `GET /api/versions` | Version negotiation: `X-API-Version` pins, `Accept-Version` picks the first supported id, none means current. Echoes `X-API-Version` + `Vary`; unknown → `406 {error:"UNSUPPORTED_API_VERSION",requested,supported}`, sunset → `410 API_VERSION_SUNSET`; `Deprecation`/`Sunset`/`Link` from `ROUTE_DEPRECATIONS`. `/api/versions?format=openapi` serves the contract | No version headers; `/api/versions` `404` |
+| `phase-api-versioning` | `/api/*` (middleware), `GET /api/versions` | Version negotiation: `X-API-Version` pins, `Accept-Version` picks the first supported id, none means current. Echoes `X-API-Version` + `Vary`; unknown → `406 {error:"UNSUPPORTED_API_VERSION",requested,supported}`, sunset → `410 API_VERSION_SUNSET`; `Deprecation`/`Sunset`/`Link` from `ROUTE_DEPRECATIONS`. `/api/versions?format=openapi` serves the contract | No version headers; `/api/versions` `404` |
 
 ### 5.3 Signal concurrency contract
 
@@ -420,8 +420,8 @@ NEXT_PUBLIC_FEATURE_PHASE_158=1
 NEXT_PUBLIC_FEATURE_PHASE_159=1
 NEXT_PUBLIC_FEATURE_PHASE_160=1
 NEXT_PUBLIC_FEATURE_PHASE_161=1
-NEXT_PUBLIC_FEATURE_PHASE_162=1   # build-time
-NEXT_PUBLIC_FEATURE_PHASE_163=1
+NEXT_PUBLIC_FEATURE_PHASE_DOCS_PLAYGROUND=1   # build-time
+NEXT_PUBLIC_FEATURE_PHASE_API_VERSIONING=1
 # Server-only aliases also accepted: FEATURE_PHASE_104, etc.
 ```
 
@@ -440,8 +440,8 @@ Rollback: unset the var or set `0` and restart. No ledger migration to revert; o
 
 | Flag | Scope | Rollback |
 |---|---|---|
-| `phase-162` | Docs playground (spike 662): `/docs` "Try it live" section. Logic in `lib/api-playground.ts`, UI in `components/docs-api-playground.tsx`, operations from `lib/api-contract.ts` | Unset, rebuild, restart. Section disappears, nothing persisted |
-| `phase-163` | API versioning (spike 663): middleware negotiation, version echo, deprecation headers, `/api/versions`. Contract lives in `lib/api-contract.ts`; `npm run api:contract -- --write` regenerates `docs/api/openapi.json` + `changelog.json` | Unset, restart. Headers stop, `/api/versions` 404s. The CI gate is source-only and stays |
+| `phase-docs-playground` | Docs playground (spike 662): `/docs` "Try it live" section. Logic in `lib/api-playground.ts`, UI in `components/docs-api-playground.tsx`, operations from `lib/api-contract.ts` | Unset, rebuild, restart. Section disappears, nothing persisted |
+| `phase-api-versioning` | API versioning (spike 663): middleware negotiation, version echo, deprecation headers, `/api/versions`. Contract lives in `lib/api-contract.ts`; `npm run api:contract -- --write` regenerates `docs/api/openapi.json` + `changelog.json` | Unset, restart. Headers stop, `/api/versions` 404s. The CI gate is source-only and stays |
 
 ---
 

@@ -203,7 +203,7 @@ export type QuestArcCopy = {
   }
 }
 
-/** phase-162 docs playground. `{sec}`, `{address}`, `{field}` placeholders where noted. */
+/** phase-docs-playground docs playground. `{sec}`, `{address}`, `{field}` placeholders where noted. */
 export type PlaygroundCopy = {
   sectionTitle: string
   intro: string
