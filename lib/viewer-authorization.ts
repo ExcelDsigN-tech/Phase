@@ -28,6 +28,7 @@
  */
 
 import { getDb } from "@/lib/sqlite-db"
+import { resolveStellarNetwork } from "@/lib/stellar-network"
 
 /** Domain separator. Any change invalidates every previously issued signature. */
 export const VIEWER_SIGNATURE_DOMAIN = "Phase SEP50"
@@ -124,11 +125,7 @@ export function releaseJti(jti: string): void {
 
 /** The network this server settles on. Mismatched signatures are rejected. */
 export function serverNetworkPassphrase(): string {
-  return (
-    process.env.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE ??
-    process.env.STELLAR_NETWORK_PASSPHRASE ??
-    "Test SDF Network ; September 2015"
-  )
+  return resolveStellarNetwork().passphrase
 }
 
 /**

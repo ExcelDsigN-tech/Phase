@@ -9,6 +9,7 @@ import { useLang } from "@/components/lang-context"
 import { IpfsDisplayImg } from "@/components/ipfs-display-img"
 import { TokenIcon } from "@/components/token-icon"
 import { useWallet } from "@/components/wallet-provider"
+import { WalletHistoryTimeline } from "@/components/wallet-history-timeline"
 import { pickCopy } from "@/lib/phase-copy"
 import { cn } from "@/lib/utils"
 import {
@@ -624,6 +625,12 @@ export default function DashboardPage() {
                       </ul>
                     </div>
                   )}
+
+                  {/* ── Per-wallet Horizon timeline (spike 629 / phase-173) ── */}
+                  <WalletHistoryTimeline
+                    address={address}
+                    className="mb-8 w-full border-l-4 border-cyan-500/70 bg-cyan-950/20 p-4"
+                  />
 
                   {/* RPC Vault */}
                   <div>

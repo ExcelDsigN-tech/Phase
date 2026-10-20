@@ -1,6 +1,7 @@
 "use client"
 
 import { albedoImplicitTxAllowed, isAlbedoSelectedInKit } from "@/lib/albedo-intent-client"
+import { albedoRetiredSignMessage, isAlbedoRetired } from "@/lib/albedo-sunset"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react"
@@ -19,6 +20,12 @@ import { humanizePhaseHostErrorMessage } from "@/lib/phase-host-error"
 import { pickCopy } from "@/lib/phase-copy"
 import { cn } from "@/lib/utils"
 import { GatewayHealthDashboard } from "@/components/gateway-health-dashboard"
+import { QrScannerModal } from "@/components/qr-scanner-modal"
+import type { ParsedQrPayload } from "@/lib/qr-code"
+import { recordMobileDeepLinkReturn } from "@/lib/walletconnect-resilience"
+import { isFeatureEnabled } from "@/lib/feature-flags"
+import { decodeSorobanTransaction } from "@/lib/ledger-soroban-decoder"
+
 import {
   buildClassicTrustlineTransactionXdr,
   classicLiqAssetConfigFromPublicEnv,
@@ -126,7 +133,8 @@ export function FusionChamber() {
     return Number.isFinite(n) && n >= 0 ? n : 0
   }, [searchParams])
 
-  const { address, connect, disconnect, connecting, refresh, openWalletPicker, artistAlias } = useWallet()
+  const { address, connect, disconnect, connecting, refresh, openWalletPicker, artistAlias, isHardwareWallet, requestLedgerReview } = useWallet()
+
   const logEndModalRef = useRef<HTMLDivElement>(null)
   const logEndDockRef = useRef<HTMLDivElement>(null)
   const logId = useRef(0)
@@ -165,6 +173,7 @@ export function FusionChamber() {
   const [freighterIndexPingBusy, setFreighterIndexPingBusy] = useState(false)
   const [freighterTransferBusy, setFreighterTransferBusy] = useState(false)
   const [freighterTransferTo, setFreighterTransferTo] = useState("")
+  const [recipientScanOpen, setRecipientScanOpen] = useState(false)
   const [freighterSep50Busy, setFreighterSep50Busy] = useState(false)
   const [freighterSep50Report, setFreighterSep50Report] = useState<string | null>(null)
   const [collectionSupply, setCollectionSupply] = useState<{ minted: number; cap: number } | null>(null)
@@ -773,7 +782,17 @@ export function FusionChamber() {
         invoiceId,
         collectionId,
       )
+      if (isHardwareWallet && isFeatureEnabled("phase-169") && requestLedgerReview) {
+        const decoded = decodeSorobanTransaction(txEnvelope, NETWORK_PASSPHRASE)
+        if (decoded) {
+          const approved = await requestLedgerReview(decoded)
+          if (!approved) {
+            throw new Error("Ledger: clear-signing review rejected by user")
+          }
+        }
+      }
       const signResult = await signTransaction(txEnvelope, {
+
         networkPassphrase: NETWORK_PASSPHRASE,
         address: signerAddress,
       })
@@ -1045,6 +1064,13 @@ export function FusionChamber() {
     setClassicBusy(true)
     try {
       const chCopy = pickCopy(lang).chamber
+      // Spike 626: retired Albedo never reaches the implicit-session probe.
+      if (isAlbedoSelectedInKit() && isAlbedoRetired()) {
+        const retiredMsg = albedoRetiredSignMessage()
+        toast.error(retiredMsg)
+        appendLog(retiredMsg)
+        return
+      }
       if (isAlbedoSelectedInKit() && !(await albedoImplicitTxAllowed(address))) {
         toast.error(chCopy.rewardsTrustlineAlbedoImplicitRequired)
         appendLog(chCopy.rewardsTrustlineAlbedoImplicitRequired)
@@ -1310,7 +1336,19 @@ export function FusionChamber() {
       setFreighterTransferBusy(true)
       try {
         const txEnvelope = await buildTransferPhaseNftTransaction(g, toRaw, tid)
+        recordMobileDeepLinkReturn()
+        if (isHardwareWallet && isFeatureEnabled("phase-169") && requestLedgerReview) {
+          const decoded = decodeSorobanTransaction(txEnvelope, NETWORK_PASSPHRASE)
+          if (decoded) {
+            const approved = await requestLedgerReview(decoded)
+            if (!approved) {
+              toast.error("Ledger: clear-signing review rejected")
+              return
+            }
+          }
+        }
         const signResult = await signTransaction(txEnvelope, {
+
           networkPassphrase: NETWORK_PASSPHRASE,
           address: g,
         })
@@ -2626,6 +2664,20 @@ export function FusionChamber() {
           </div>
         </>
       ) : null}
+
+      <QrScannerModal
+        open={recipientScanOpen}
+        onOpenChange={setRecipientScanOpen}
+        title="◈ SCAN RECIPIENT STELLAR ADDRESS"
+        onScan={(result: ParsedQrPayload) => {
+          if (result.type === "stellar_address" || result.type === "stellar_pay_uri") {
+            setFreighterTransferTo(result.address)
+            void runNftTransferToRecipient(result.address)
+          } else if (result.type === "raw" && result.text) {
+            setFreighterTransferTo(result.text)
+          }
+        }}
+      />
     </div>
   )
 }

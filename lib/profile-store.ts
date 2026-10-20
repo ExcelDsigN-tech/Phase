@@ -11,6 +11,9 @@ export type ProfileData = {
   avatar_token_id?: number;
   avatar_image_url?: string;
   locale?: ProfileLocale;
+  tos_version?: string;
+  privacy_version?: string;
+  accepted_at?: number;
   updated_at: number;
 };
 
@@ -29,6 +32,11 @@ export async function saveProfile(
   wallet: string,
   data: Omit<ProfileData, "updated_at">,
 ): Promise<ProfileData> {
+  const existing = await getProfile(wallet);
+  if (existing) {
+    const { assertNoLegalHold } = await import("@/lib/legal-hold");
+    await assertNoLegalHold("wallet", wallet, "save_profile");
+  }
   const entry: ProfileData = {
     ...data,
     updated_at: Date.now(),

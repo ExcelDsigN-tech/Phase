@@ -588,6 +588,8 @@ export async function takedownSignal(
 ): Promise<Signal> {
   const row = getSignalRow(id);
   if (!row) throw new Error("Signal not found");
+  const { assertNoLegalHold } = await import("@/lib/legal-hold");
+  await assertNoLegalHold("signal", id, "takedown", row.author_wallet);
   const taken_down_at = Date.now();
   getDb()
     .prepare(
@@ -606,6 +608,8 @@ export async function takedownSignal(
 export async function restoreSignal(id: string): Promise<Signal> {
   const row = getSignalRow(id);
   if (!row) throw new Error("Signal not found");
+  const { assertNoLegalHold } = await import("@/lib/legal-hold");
+  await assertNoLegalHold("signal", id, "restore", row.author_wallet);
   getDb()
     .prepare(
       "UPDATE signals SET taken_down = 0, takedown_reason = NULL, taken_down_at = NULL WHERE id = ?",
@@ -1435,4 +1439,29 @@ export async function toggleSignalReaction(
   const summary = await getSignalReactionSummary(signal_id, wallet);
   return { toggled, summary };
 }
+
+/**
+ * phase-167 / Spike 634: Export authored signals, replies, and reactions for GDPR Article 20 data portability.
+ */
+export async function exportSignalsForWallet(wallet: string): Promise<{
+  signals: Array<Record<string, unknown>>;
+  replies: Array<Record<string, unknown>>;
+  reactions: Array<Record<string, unknown>>;
+}> {
+  const db = getDb();
+  const signals = db
+    .prepare("SELECT id, channel, title, body, status, created_at, updated_at FROM signals WHERE author_wallet = ?")
+    .all(wallet) as Array<Record<string, unknown>>;
+
+  const replies = db
+    .prepare("SELECT id, signal_id, body, created_at FROM signal_replies WHERE author_wallet = ?")
+    .all(wallet) as Array<Record<string, unknown>>;
+
+  const reactions = db
+    .prepare("SELECT signal_id, emoji, created_at FROM signal_reactions WHERE wallet = ?")
+    .all(wallet) as Array<Record<string, unknown>>;
+
+  return { signals, replies, reactions };
+}
+
 
