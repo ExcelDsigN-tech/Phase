@@ -641,3 +641,64 @@ rather than widened.
 Per-file rulings for each issue's affected-file list are in
 `docs/spikes/142-curator-exhibitions.md`, `143-pricing-oracle.md`,
 `146-moderation-triage.md` and `147-quest-arcs.md`.
+
+## 15. Auth, network, age gating and licensing (spikes 637, 639, 640, 641)
+
+Flags: `phase-162` (SEP-10), `phase-163` (network), `phase-164` (age gate), `phase-165` (license attestation). All default off. See `PROJECT_ARCHITECTURE.md` §10.
+
+| Env | Scope | Purpose |
+|-----|-------|---------|
+| `SEP10_SERVER_SECRET` | server only | Signs SEP-10 challenge transactions. Never expose with `NEXT_PUBLIC_*`. |
+| `SEP10_HOME_DOMAIN` | server | Home domain bound into challenges (default `phase.app`). |
+| `SEP10_WEB_AUTH_DOMAIN` | server | Web auth domain (defaults to home domain). |
+| `STELLAR_NETWORK` | server + client | `testnet` (default) or `mainnet`. Selects the canonical passphrase. |
+| `STELLAR_NETWORK_PASSPHRASE` | server | Optional; must match `STELLAR_NETWORK` or startup resolution throws. |
+| `PHASE_MAINNET_CUTOVER_ACK` | server | Must be `1` to resolve `mainnet` (cutover ceremony acknowledgement). |
+
+Sidecars (`.data/`, or `PHASE_SERVER_DATA_DIR`): `auth-sessions.json` (SHA-256 of session tokens and consumed challenge hashes only), `age-declarations.json` (bands only, no birth years), `license-attestations.json` (one per collection, nonce-unique).
+
+Known gaps: header-based routes (`acting_wallet`, `X-Wallet-Address`) are not yet migrated to sessions; sidecar writes are unlocked (single-instance only, same as other sidecars); viewer/claim-side age gating and mainnet seeding are not implemented.
+
+## 16. QR code flows and camera transport (spike 622)
+
+Flag: `phase-166` (`NEXT_PUBLIC_FEATURE_PHASE_166` / `FEATURE_PHASE_166`). Default off. See `PROJECT_ARCHITECTURE.md` §10.
+
+- `lib/qr-code.ts`: Model 2 Version 2 pure SVG QR code generator, data URL formatter, SEP-0007 / referral parser, camera diagnostics with `diagnoseCameraError`.
+- `next.config.mjs`: `Permissions-Policy: camera=(self), microphone=(), geolocation=()` to allow video frame capture on the same origin.
+- Components: `components/qr-code-dialog.tsx` for generating and displaying styled QR codes with optional amount requests, `components/qr-scanner-modal.tsx` with camera viewfinder reticle and manual input fallback.
+- Routes: `GET /api/qr/encode` for server-side SVG generation.
+- Audit counters: `qr_generated_receive`, `qr_generated_referral`, `qr_scanned_success`, `qr_scanned_invalid`, `qr_camera_denied` in `lib/security-counters.ts`.
+
+## 17. WalletConnect v2 mobile session resilience (spike 623)
+
+Flag: `phase-167` (`NEXT_PUBLIC_FEATURE_PHASE_167` / `FEATURE_PHASE_167`). Default off. See `PROJECT_ARCHITECTURE.md` §10.
+
+- `lib/walletconnect-resilience.ts`: Configurable relay URL resolution, multi-chain target resolution (`stellar:testnet` and `stellar:pubnet`), session metadata persistence in localStorage (`@PHASE/wc_session_metadata`), chain-switch guard, and mobile deep-link return helpers.
+- `lib/stellar-wallet-kit.ts`: `WalletConnectModule` initialized with dynamic `relayUrl` and multi-chain array.
+- Components: `components/walletconnect-banner.tsx` displaying peer wallet connection status, relay state, and one-click session reconnect.
+- Routes: `POST /api/wallet/session` recording session lifecycle telemetry.
+- Audit counters: `wc_session_restored`, `wc_session_expired`, `wc_reconnect_success`, `wc_reconnect_failed`, `wc_chain_mismatch_blocked` in `lib/security-counters.ts`.
+
+## 18. xBull wallet full support and parity (spike 624)
+
+Flag: `phase-168` (`NEXT_PUBLIC_FEATURE_PHASE_168` / `FEATURE_PHASE_168`). Default off. See `PROJECT_ARCHITECTURE.md` §10.
+
+- `lib/xbull-adapter.ts`: xBull detection (`XBULL_ID`, `isXBullSelected()`), Freighter vs. xBull difference matrix, sign result normalization (`normalizeXBullSignResult()`), and error translation (`mapXBullError()`).
+- `components/wallet-badge.tsx`: Active wallet badge component displaying provider type (xBull, Freighter, Ledger, Albedo, WalletConnect) with contextual styling.
+- `lib/classic-liq.ts`: Updated `parseSignedTxXdr` with multi-format support accommodating xBull's return shape variations (`xdr`, `result`, `signedTxXdr`, raw string).
+- `lib/stellar-wallet-kit.ts`: Normalized signing pipeline routing xBull transactions through error mapping and result unpackers.
+- Audit counters: `xbull_sign_requested`, `xbull_sign_success`, `xbull_sign_rejected`, `xbull_trustline_signed`, `xbull_error_mapped` in `lib/security-counters.ts`.
+
+## 19. Ledger blind-signing to clear-signing review for Soroban (spike 625)
+
+Flag: `phase-169` (`NEXT_PUBLIC_FEATURE_PHASE_169` / `FEATURE_PHASE_169`). Default off. See `PROJECT_ARCHITECTURE.md` §10.
+
+- `lib/ledger-soroban-decoder.ts`: Decodes `invokeHostFunction` operations, extracts contract address, host function name (`settle`, `create_collection`, `transfer`, `initiate_phase`), and native arguments. Computes canonical verification hash and 8-character verification code (`VREF-XXXX-XXXX`) matching on-device pre-image. Performs preflight validation to catch Gate #13 errors (`SelfTransfer` and invalid caller/balance) before prompting hardware.
+- `components/ledger-clear-signing-modal.tsx`: Preflight review modal showing contract target, function, decoded arguments, fee, and verification code with confirmation before transmitting to device.
+- `lib/phase-host-error.ts`: Added `humanizeLedgerHardwareErrorMessage` recognizing `0x6b0c` / `0x6a15` (blind-signing disabled in Ledger Stellar app settings), `0x6985` (user rejected), and `0x6e00` (device locked or disconnected).
+- `lib/stellar-wallet-kit.ts`: Intercepts hardware wallet signing with preflight validation when `phase-169` is enabled.
+- Audit counters: `ledger_clear_signing_reviewed`, `ledger_clear_signing_approved`, `ledger_clear_signing_rejected`, `ledger_blind_signing_blocked`, `ledger_gate13_preempted` in `lib/security-counters.ts`.
+- Routes: `POST /api/wallet/ledger` for clear-signing lifecycle telemetry.
+
+
+

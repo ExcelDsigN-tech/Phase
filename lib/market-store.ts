@@ -513,6 +513,11 @@ async function setListingStatus(
 }
 
 export async function cancelListing(id: string): Promise<Listing | null> {
+  const listing = await getListing(id);
+  if (listing) {
+    const { assertNoLegalHold } = await import("@/lib/legal-hold");
+    await assertNoLegalHold("listing", id, "cancel_listing", listing.seller_wallet);
+  }
   return setListingStatus(id, "cancelled");
 }
 
@@ -1180,3 +1185,15 @@ export function getWashFlaggedTokenIds(tokenIds: readonly number[], since: numbe
     .all(since, ...tokenIds) as Array<{ token_id: number }>;
   return new Set(rows.map((r) => r.token_id));
 }
+
+/**
+ * phase-167 / Spike 634: Export marketplace listings and offers for GDPR Article 20 data portability.
+ */
+export async function exportMarketForWallet(
+  wallet: string,
+): Promise<{ listings: Listing[]; offers_as_buyer: Offer[] }> {
+  const listings = await getListings({ seller_wallet: wallet });
+  const offers_as_buyer = await getOffersByBuyer(wallet);
+  return { listings, offers_as_buyer };
+}
+

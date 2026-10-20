@@ -103,3 +103,46 @@ declare module '@creit.tech/stellar-wallets-kit/modules/freighter' {
     constructor(config?: any);
   }
 }
+
+declare module '@creit.tech/stellar-wallets-kit/modules/wallet-connect' {
+  export const WALLET_CONNECT_ID: string;
+  export enum WalletConnectTargetChain {
+    PUBLIC = 'PUBLIC',
+    TESTNET = 'TESTNET',
+  }
+  export interface WalletConnectModuleConfig {
+    projectId: string;
+    relayUrl?: string;
+    metadata?: {
+      name: string;
+      description: string;
+      url: string;
+      icons: string[];
+    };
+    allowedChains?: (WalletConnectTargetChain | string)[];
+  }
+  export class WalletConnectModule {
+    constructor(config: WalletConnectModuleConfig);
+  }
+}
+
+declare module '@creit.tech/stellar-wallets-kit/modules/xbull' {
+  export const XBULL_ID: string;
+  export class xBullModule {
+    constructor(config?: any);
+  }
+}
+
+declare module '@creit.tech/stellar-wallets-kit/modules/ledger' {
+  export const LEDGER_ID: string;
+  export interface LedgerModuleConfig {
+    transport?: any;
+    bip32Path?: string;
+    clearSigningEnabled?: boolean;
+  }
+  export class LedgerModule {
+    constructor(config?: LedgerModuleConfig);
+  }
+}
+
+

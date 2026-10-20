@@ -57,3 +57,28 @@ export async function getModerationAuditEvents(signalId: string): Promise<Modera
     .filter((event) => event.signal_id === signalId)
     .sort((a, b) => a.created_at - b.created_at)
 }
+
+/**
+ * Retrieve all moderation audit events across signals, with optional filtering.
+ */
+export async function getAllModerationAuditEvents(filter?: {
+  from?: number;
+  to?: number;
+  action?: ModerationAction;
+}): Promise<ModerationAuditEvent[]> {
+  const store = await readAuditStore();
+  let events = Object.values(store);
+
+  if (filter?.from !== undefined) {
+    events = events.filter((e) => e.created_at >= filter.from!);
+  }
+  if (filter?.to !== undefined) {
+    events = events.filter((e) => e.created_at <= filter.to!);
+  }
+  if (filter?.action) {
+    events = events.filter((e) => e.action === filter.action);
+  }
+
+  return events.sort((a, b) => a.created_at - b.created_at);
+}
+

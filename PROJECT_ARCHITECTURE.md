@@ -204,11 +204,56 @@ is a fixed-size digest of the canonical payload, keeping it under wallet
 | `phase-159` | `NEXT_PUBLIC_FEATURE_PHASE_159` / `FEATURE_PHASE_159` | Batched owner-key loader (`lib/owner-batch-loader.ts`): DataLoader-style per-tick coalescing, key dedupe, chunking and memoization to remove N+1 owner reads. Partial slice of spike 656 (issue #518) — route wiring, index pushdown, and sidecar `mget` are follow-ups | off | Unset var, restart — callers use their unbatched per-token path (pre-phase-159 behavior); only in-memory cache dropped |
 | `phase-160` | `NEXT_PUBLIC_FEATURE_PHASE_160` / `FEATURE_PHASE_160` | Web Vitals budgets (`lib/web-vitals-budgets.ts`): per-route LCP/INP/CLS budget table plus pass/fail evaluation and worst-per-vital summary. Partial slice of spike 657 (issue #520) — no live collector, RUM transport, or PR-blocking gate yet | off | Unset var, restart — no vitals evaluated or reported; the budget table is inert (no persisted state) |
 | `phase-161` | `NEXT_PUBLIC_FEATURE_PHASE_161` / `FEATURE_PHASE_161` | Typed contract-error taxonomy (`lib/phase-error-taxonomy.ts`): code-stable `PhaseError` descriptors 1..39 with `retryable` hints and `userMessageKey`s, mapped from raw host errors. Partial slice of spike 660 (issue #523) — Horizon/RPC transport taxonomy and retry policy are follow-ups | off | Unset var, restart — callers keep using the string helpers in `lib/phase-host-error.ts` (pre-phase-161 behavior); module stays inert |
+| `phase-162` | `NEXT_PUBLIC_FEATURE_PHASE_162` / `FEATURE_PHASE_162` | SEP-10 web auth (`lib/sep10-auth.ts`): `GET /api/auth/challenge?account=` issues a challenge tx signed by `SEP10_SERVER_SECRET`; `POST /api/auth/session` verifies the wallet-signed challenge (single-use) and returns an opaque bearer session (1h); `DELETE /api/auth/session` revokes. Partial slice of spike 641 (issue #503) — existing `acting_wallet` / `X-Wallet-Address` routes are not migrated yet | off | Unset var, restart — auth routes return 404, `resolveSessionWallet` returns null, header-based routes unchanged; `auth-sessions.json` stays inert |
+| `phase-163` | `NEXT_PUBLIC_FEATURE_PHASE_163` / `FEATURE_PHASE_163` | Stellar network resolution (`lib/stellar-network.ts`): `STELLAR_NETWORK` (`testnet` default, `mainnet`) selects the canonical passphrase; a conflicting `STELLAR_NETWORK_PASSPHRASE` throws; mainnet requires `PHASE_MAINNET_CUTOVER_ACK=1`. Partial slice of spike 640 (issue #502) — no seeding or ceremony tooling yet | off | Unset `STELLAR_NETWORK` (defaults to testnet). Note: `serverNetworkPassphrase()` now always resolves through this module regardless of the flag, so the mainnet ACK gate is not flag-dependent |
+| `phase-164` | `NEXT_PUBLIC_FEATURE_PHASE_164` / `FEATURE_PHASE_164` | Self-attested age bands (`lib/age-gate.ts`): `POST /api/age-gate/declare` binds a birth year to the SEP-10 session wallet and stores only the band (first declaration final). `POST /api/world` with `age_gate: "18+" \| "21+"` requires a session from the creator and returns `451 AGE_GATE_REQUIRED` when unmet. Requires phase-162. Partial slice of spike 637 (issue #499) — viewer/claim-side gating and KYC are follow-ups | off | Unset var, restart — declare route returns 404, gated world creation is ignored; `age-declarations.json` bands stay inert |
+| `phase-165` | `NEXT_PUBLIC_FEATURE_PHASE_165` / `FEATURE_PHASE_165` | Signed creator licensing declaration (`lib/license-attestation.ts`): first world creation requires `license_attestation` (`original`, `ai-generated`, `licensed`, `public-domain`, `fair-use`; non-original needs `evidence_cid`) signed by the creator wallet over `PHASE_LICENSE_ATTESTATION_V1`; 422 on missing/invalid, 409 on reused nonce or already-declared collection. Partial slice of spike 639 (issue #501) — market/bulk-CSV license surfacing and revocation are follow-ups | off | Unset var, restart — world creation no longer requires attestation; `license-attestations.json` stays inert |
+| `phase-166` | `NEXT_PUBLIC_FEATURE_PHASE_166` / `FEATURE_PHASE_166` | QR code flows for receive, offer-claim and referral share with camera scan (`lib/qr-code.ts`): Model 2 QR matrix encoder, SVG generator, SEP-0007 / referral parser, camera diagnostics with `camera=(self)` Permissions-Policy. Spike 622 (issue #485) | off | Unset var, restart — QR dialogs and camera scanner disabled, UI falls back to clipboard copy and manual text input |
+| `phase-167` | `NEXT_PUBLIC_FEATURE_PHASE_167` / `FEATURE_PHASE_167` | WalletConnect v2 mobile session resilience (`lib/walletconnect-resilience.ts`): configurable relay URL, multi-chain support, session persistence, chain-switch guard, and mobile deep-link return. Spike 623 (issue #486) | off | Unset var, restart — WalletConnect banner and reconnect actions disabled, kit falls back to default single-session behavior |
+| `phase-168` | `NEXT_PUBLIC_FEATURE_PHASE_168` / `FEATURE_PHASE_168` | xBull wallet full support and parity (`lib/xbull-adapter.ts`): Freighter-difference matrix, xBull module detection, sign result normalization, trustline error translation, and badge surfacing. Spike 624 (issue #487) | off | Unset var, restart — xBull transactions fall through generic kit handlers, badge hidden |
+| `phase-169` | `NEXT_PUBLIC_FEATURE_PHASE_169` / `FEATURE_PHASE_169` | Ledger blind-signing to clear-signing review for Soroban (`lib/ledger-soroban-decoder.ts`): invokeHostFunction pre-image decode, verification code, on-device review modal, Gate #13 preemptive validation, and hardware error humanizer. Spike 625 (issue #488) | off | Unset var, restart — Ledger transactions fall back to default blind-signing flow without preflight review modal |
 | `phase-motion` | `NEXT_PUBLIC_FEATURE_PHASE_MOTION` (build-time; `FEATURE_PHASE_MOTION` alone has no effect) | Lean motion (spike 659 / #522): root layout stamps `data-phase-motion="lean"`; Lenis only on `/`, hero fade on a CSS scroll timeline with gsap fallback, batched `ScrollTrigger.batch` reveals, server-rendered H1 with a WAAPI flap, compositor-only loops, transient `will-change`, reduced motion honored by ticker/skeletons/flap/smooth scroll | off | Unset var, rebuild and restart — attribute is absent, scoped CSS goes inert, legacy animation paths run; no data written |
 
 Flags are read via `lib/feature-flags.ts:isFeatureEnabled`. Client flags use `NEXT_PUBLIC_*`, server also accepts `FEATURE_*`. Zero regression when off.
 
-## 11) Change-management rules
+## 11) Soroban Contracts (Spikes 645–648)
+
+### phase-protocol (Spike 645 — SEP-50 Conformance)
+Main PHASE NFT contract now fully SEP-50 compliant:
+- `token_metadata()` returns Map with required fields: `name`, `description`, `image`, `mime_type`, `properties`
+- Properties JSON includes: `token_id`, `phase_level`, `collection_id`
+- `owner_of()`, `token_uri()` per SEP-50 spec
+- Transfer/approval functions support SEP-50 multi-signature workflows
+- Contract events (mint, transfer) aligned with SEP-50 indexer expectations
+
+### proof-relay (Spike 647 — Cross-Chain Verification)
+Generic cross-chain proof verification contract:
+- `submit_proof(msg_id, proof_data, source_chain)` — register proof for multi-sig verification
+- `verify_proof(msg_id, signatures)` — multi-signature threshold validation
+- `get_proof(msg_id)` — retrieve proof status (Pending | Verified | Failed)
+- Chainwhitelist for supported external systems
+- Nonce-based replay protection per source chain
+- Validator set with configurable 3-of-N threshold
+
+### explorer-metadata (Spike 648 — Explorer Integration)
+Collection metadata for explorer verification badges:
+- `set_explorer_metadata(collection_id, name, external_url)` — register collection for discovery
+- `verify_collection(collection_id)` — admin verification (displays badge)
+- `get_metadata(collection_id)` — retrieves name, URL, verification status
+- `is_verified(collection_id)` — quick check for badge eligibility
+- Deep-links to Stellar Expert and Soroban Explorer
+
+### API Endpoints (Spike 647–648)
+- `POST /api/proof-verify` — submit cross-chain proof with signatures
+- `GET /api/proof-verify?msg_id=...` — check proof verification status
+- `POST /api/explorer-verify` — register collection metadata
+- `GET /api/explorer-verify?collection_id=...` — retrieve explorer metadata
+
+### UI Components (Spike 648)
+- `components/nft/VerificationBadge.tsx` — displays verified artist badge with Stellar Expert link
+- `components/nft/ExplorerLinks.tsx` — deep-links to Stellar Expert and Soroban Explorer
+
+## 12) Change-management rules
 
 - Architectural changes require updates to:
   - `PROJECT_ARCHITECTURE.md` (this file)
