@@ -44,7 +44,7 @@ The public API has no version prefix, no `Accept-Version` / `X-API-Version` head
 
 `next build && next start` of `feat/docs-api-playground` (which contains this branch), run on 2026-10-18.
 
-- **Flag on (`FEATURE_PHASE_API_VERSIONING=1`):** `npm run proof:663` passed 15/15. `/api/versions` returned 200 with current `2026-10-17`, the OpenAPI document has 15 paths, all ten listed routes echo `X-API-Version` with the full `Vary` superset, `X-API-Version` pinning and `Accept-Version` lists work, and `1999-01-01` gets a typed `406 UNSUPPORTED_API_VERSION`.
+- **Flag on (`FEATURE_PHASE_API_VERSIONING=1`, then named `FEATURE_PHASE_163`):** `npm run proof:663` passed 15/15. `/api/versions` returned 200 with current `2026-10-17`, the OpenAPI document has 15 paths, all ten listed routes echo `X-API-Version` with the full `Vary` superset, `X-API-Version` pinning and `Accept-Version` lists work, and `1999-01-01` gets a typed `406 UNSUPPORTED_API_VERSION`.
 - **Gated cache key kept:** `/api/metadata/1` responds with `Vary: Accept-Version, X-API-Version, Authorization, Accept-Language, X-Phase-Lang`.
 - **Flag off:** the proof reports `/api/versions` → 404 as expected. `GET /api/market` with `X-API-Version: nope` returns 200 with no `X-API-Version` header, which is the pre-spike behavior.
 
